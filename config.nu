@@ -382,24 +382,41 @@ $env.config = {
         description_text: yellow
       }
     },
+    {
+      name: vars_menu
+      only_buffer_difference: true
+      marker: "# "
+      # type: {
+      #   layout: columnar
+      #   columns: 4
+      #   col_width: 20     # Optional value. If missing all the screen width is used to calculate column width
+      #   col_padding: 2
+      # }
+      type: {
+        layout: list
+        page_size: 10
+      }
+      style: {
+        text: green
+        selected_text: green_reverse
+        description_text: yellow
+      },
+      source : { |buffer, position|
+        scope variables
+        | where name =~ $buffer
+        | sort-by name
+        | each { |it| {value: $it.name description: $it.type}}
+      }
+    }
   ]
 
   keybindings: [
     {
-      name: fuzzy_dir
+      name: vars_menu
       modifier: control
-      keycode: char_s
-      mode: [emacs, vi_normal, vi_insert]
-      event: {
-        send: executehostcommand
-        cmd: "commandline edit --append (
-        ls **/*
-        | where type == dir
-        | get name
-        | input list --fuzzy
-        $'Please choose a (ansi magenta)directory(ansi reset) to (ansi cyan_underline)insert(ansi reset):'
-        )"
-      }
+      keycode: char_v
+      mode: [emacs vi_normal vi_insert]
+      event: { send: menu name: vars_menu }
     },
     {
       name: completion_menu
