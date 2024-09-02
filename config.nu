@@ -960,7 +960,14 @@ def nu-treesitter-highlights [] {
 }
 
 def edit-vars [] {
-  rundll32.exe sysdm.cpl,EditEnvironmentVariables
+  let host = sys host | get name
+
+  if host == 'Windows' {
+    rundll32.exe sysdm.cpl,EditEnvironmentVariables
+  } else {
+    echo "Warning: Unix systems do not usually include GUI editors for Environment Variables. \n Exiting... Command"
+  }
+  
 }
 
 def "start clips" [path?: string = "CLIPS"] {
