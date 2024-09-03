@@ -992,6 +992,11 @@ def "start clips" [path?: string = "CLIPS"] {
   }
 }
 
+def "start formtools" [] {
+  cd `D:\CommSys\CLIPS\FormTools\ClipsWebTools\`
+  php -S 127.0.0.1:8080 -t .
+}
+
 def "start vs" [] {
   let path = (ls ...(glob *.sln) | $in.0.name)
   `C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\devenv` $path
