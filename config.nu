@@ -967,7 +967,6 @@ def edit-vars [] {
   } else {
     echo "Warning: Unix systems do not usually include GUI editors for Environment Variables. \n Exiting... Command"
   }
-  
 }
 
 def "start clips" [path?: string = "CLIPS"] {
