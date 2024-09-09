@@ -231,7 +231,7 @@ $env.config = {
   buffer_editor: null # command that will be used to edit the current line buffer with ctrl+o, if unset fallback to $env.EDITOR and $env.VISUAL
   use_ansi_coloring: true
   bracketed_paste: true # enable bracketed paste, currently useless on windows
-  edit_mode: emacs # emacs, vi
+  edit_mode: vi # emacs, vi
   shell_integration: {
     # osc2 abbreviates the path if in the home_dir, sets the tab/window title, shows the running command in the tab/window title
     osc2: true
@@ -293,7 +293,45 @@ $env.config = {
       ] # run if the PWD environment is different since the last repl input
     }
     display_output: "if (term size).columns >= 100 { table -e } else { table }" # run to display the output of a pipeline
-    command_not_found: { null } # return an error message when a command is not found
+    command_not_found: {|cmd|
+      let commands_in_path = (
+        if ($nu.os-info.name == windows) {
+          $env.Path | each {|directory|
+            if ($directory | path exists) {
+              let cmd_exts = $env.PATHEXT | str downcase | split row ';' | str trim --char .
+              ls $directory | get name | path parse | where {|it| $cmd_exts | any {|ext| $ext == ($it.extension | str downcase)} } | get stem
+            }
+          }
+        } else {
+          $env.PATH | each {|directory|
+            if ($directory | path exists) {
+              ls $directory | get name | path parse | update parent "" | path join
+            }
+          }
+        }
+        | flatten
+        | wrap cmd
+      )
+
+      let closest_commands = (
+        $commands_in_path
+        | insert distance {|it|
+          $it.cmd | str distance $cmd
+        }
+        | uniq
+        | sort-by distance
+        | get cmd
+        | first 3
+      )
+
+      let pretty_commands = (
+        $closest_commands | each {|cmd|
+          $"    (ansi {fg: "default" attr: "di"})($cmd)(ansi reset)"
+        }
+      )
+
+      $"\ndid you mean?\n($pretty_commands | str join "\n")"
+    } # return an error message when a command is not found
   }
 
   menus: [
@@ -969,14 +1007,24 @@ def edit-vars [] {
   }
 }
 
+#TODO: Not make bad.
+def "query insert" []: record<jira: record<issue: list<list<any>>>> -> nothing {
+  $in.jira.issue | each {
+  |issue|
+  open hours.db
+  | query db "insert into task (summary, secs_spent, active, created_at, updated_at) values (?, ?, ?, ?, ?)" -p [$issue.0, $issue.1, true, (date now | date to-timezone utc), (date now | date
+  to-timezone utc)]
+  }
+}
+
 def "start clips" [path?: string = "CLIPS"] {
   # TODO:CHECK IF PATH IS VALID
-  let clips_dir = $'D:\CommSys\CLIPS\'
+  let clips_dir = $'D:\CommSys\CLIPS'
   let span = (metadata $path).span
-  let test_path: string = $'($clips_dir)($path)\Application'
+  let test_path: string = $'($clips_dir)\($path)\Application'
   match ($test_path | path exists) {
     true => {
-      cd $'($clips_dir)($path)\Application'
+      cd $'($clips_dir)\($path)\Application'
       ./console/cake.bat server -H 127.0.0.1 -p 80
     },
     false => {
@@ -1097,32 +1145,5 @@ def "sort combinations" [
   }
 
   return $sorted_stream
-}
-
-export def --env z [...rest:string@"__z_complete"] {
-  let arg0 = ($rest | append '~').0
-  let path = if (($rest | length) <= 1) and ($arg0 == '-' or ($arg0 | path expand | path type) == dir) {
-    $arg0
-  } else {
-    (zoxide query --exclude $env.PWD -- ...$rest | str trim -r -c "\n")
-  }
-  cd $path
-}
-
-# Jump to a directory using interactive search.
-export def --env zi [...rest:string] {
-  cd $'(zoxide query --interactive -- ...$rest | str trim -r -c "\n")'
-}
-
-# completion
-def "__z_complete" [line : string, pos: int] {
-  let prefix = ( $line | str trim | split row ' ' | append ' ' | skip 1 | get 0)
-  let data = (^zoxide query $prefix --list | lines)
-  {
-    completions : $data,
-                options: {
-                 completion_algorithm: "fuzzy"
-                }
-  }
 }
 
