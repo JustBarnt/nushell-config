@@ -73,17 +73,21 @@ $env.ENV_CONVERSIONS = {
     }
 }
 
+$env.NUPM_HOME = ($env.LOCALAPPDATA | path join "nupm")
+
 # Directories to search for scripts when calling source or use
 # The default for this is $nu.default-config-dir/scripts
 $env.NU_LIB_DIRS = [
     ($nu.default-config-dir | path join 'scripts') # add <nushell-config-dir>/scripts
     ($nu.data-dir | path join 'completions') # default home for nushell completions
+    ($env.NUPM_HOME | path join "modules")
 ]
 
 # Directories to search for plugin binaries when calling register
 # The default for this is $nu.default-config-dir/plugins
 $env.NU_PLUGIN_DIRS = [
     ($nu.default-config-dir | path join 'plugins') # add <nushell-config-dir>/plugins
+    ($env.NUPM_HOME | path join "bin" "plugins")
 ]
 
 # To add entries to PATH (on Windows you might use Path), you can use the following pattern:
@@ -103,6 +107,8 @@ path add ($env.PATH | path join 'C:\Utilities\Tools\')
 path add ($env.PATH | path join 'D:\CommSys\Utilities\DbManager\.bin')
 path add ($env.PATH | path join 'C:\Utilities\SysinternalsSuite\')
 path add ($env.PATH | path join 'C:\Utilities\StrawberryPerl\perl\bin')
+path add ($env.PATH | path join $env.NUPM_HOME "scripts")
+path add ($env.PATH | path join $env.NUPM_HOME "bin" "plugins")
 
 $env.GOPATH = 'C:\Users\bwilliams\go\'
 $env.PNPM_HOME = 'C:\Users\bwilliams\AppData\Local\pnpm\'
