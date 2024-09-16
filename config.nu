@@ -220,15 +220,15 @@ $env.config = {
 
   cursor_shape: {
     emacs: line # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (line is the default)
-    vi_insert: block # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (block is the default)
-    vi_normal: underscore # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (underscore is the default)
+    vi_insert: blink_block # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (block is the default)
+    vi_normal: block # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (underscore is the default)
   }
 
   color_config: $dark_theme # if you want a more interesting theme, you can replace the empty record with `$dark_theme`, `$light_theme` or another custom record
   use_grid_icons: true
   footer_mode: "25" # always, never, number_of_rows, auto
   float_precision: 2 # the precision for displaying floats in tables
-  buffer_editor: null # command that will be used to edit the current line buffer with ctrl+o, if unset fallback to $env.EDITOR and $env.VISUAL
+  buffer_editor: "nvim" # command that will be used to edit the current line buffer with ctrl+o, if unset fallback to $env.EDITOR and $env.VISUAL
   use_ansi_coloring: true
   bracketed_paste: true # enable bracketed paste, currently useless on windows
   edit_mode: vi # emacs, vi
@@ -261,7 +261,7 @@ $env.config = {
     reset_application_mode: true
   }
   render_right_prompt_on_last_line: false # true or false to enable or disable right prompt to be rendered on last line of the prompt.
-  use_kitty_protocol: false # enables keyboard enhancement protocol implemented by kitty console, only if your terminal support this.
+  use_kitty_protocol: true # enables keyboard enhancement protocol implemented by kitty console, only if your terminal support this.
   highlight_resolved_externals: false # true enables highlighting of external commands in the repl resolved by which.
   recursion_limit: 50 # the maximum number of times nushell allows recursion before stopping it
 
@@ -283,7 +283,12 @@ $env.config = {
   }
 
   hooks: {
-    pre_prompt: [{ null }] # run before the prompt is shown
+    pre_prompt: [
+      {
+        condition: { history | reverse | first 1 | get command | $in.0 =~ 'plugin add' }
+        code: "plugin list | select name version | transpose --ignore-titles -r -d | to json | print $in" 
+      }
+    ] # run before the prompt is shown
     pre_execution: [{ null }] # run before the repl input is run
     env_change: {
       PWD: [
@@ -292,46 +297,8 @@ $env.config = {
           }
       ] # run if the PWD environment is different since the last repl input
     }
-    display_output: "if (term size).columns >= 100 { table -e } else { table }" # run to display the output of a pipeline
-    command_not_found: {|cmd|
-      let commands_in_path = (
-        if ($nu.os-info.name == windows) {
-          $env.Path | each {|directory|
-            if ($directory | path exists) {
-              let cmd_exts = $env.PATHEXT | str downcase | split row ';' | str trim --char .
-              ls $directory | get name | path parse | where {|it| $cmd_exts | any {|ext| $ext == ($it.extension | str downcase)} } | get stem
-            }
-          }
-        } else {
-          $env.PATH | each {|directory|
-            if ($directory | path exists) {
-              ls $directory | get name | path parse | update parent "" | path join
-            }
-          }
-        }
-        | flatten
-        | wrap cmd
-      )
-
-      let closest_commands = (
-        $commands_in_path
-        | insert distance {|it|
-          $it.cmd | str distance $cmd
-        }
-        | uniq
-        | sort-by distance
-        | get cmd
-        | first 3
-      )
-
-      let pretty_commands = (
-        $closest_commands | each {|cmd|
-          $"    (ansi {fg: "default" attr: "di"})($cmd)(ansi reset)"
-        }
-      )
-
-      $"\ndid you mean?\n($pretty_commands | str join "\n")"
-    } # return an error message when a command is not found
+    display_output: { if (term size).columns >= 100 { table -ed 1 } else { table } }
+    command_not_found: {null}
   }
 
   menus: [
@@ -1103,6 +1070,47 @@ def --env refreshenv [] {
 
     let out = $user_path ++ $sys_path ++ $env.path | uniq --ignore-case
     $env.path = $out
+}
+
+def "plugin create lockfile" [] {
+  const lockfile = $"($nu.default-config-dir)/nu-lock.json"
+
+  if (lockfile_exists | path exists) {
+    plugin update lockfile
+    return
+  }
+
+  # Save current plugins to a lockfile
+  plugin list | select name version | transpose --ignore-titles -rd | to json | save nu-lock.json
+}
+
+def "plugin update lockfile" [] {
+  const lockfile = $"($nu.default-config-dir)/nu-lock.json"
+  const plugins = plugin list | select name version | transpose --ignore-titles -rd
+
+  # TODO: Handle going through this better instead of just merging. 
+  # I.E: Handle removal of plugins
+  $lockfile | merge $plugins | to json | save nu-lock.json -f
+}
+
+def "plugin install" [] {
+  const lockfile = $"($nu.default-config-dir)/nu-lock.json"
+  let plugins = each $lockfile | transpose name version | { |plugin| 
+    mut arr = []
+    arr | insert $"nu_plugin_($plugin.name)"
+  }
+
+  #TODO: Find a way to know if plugin is available in cargo before trying to install it.
+  try {
+    $plugins | each { |plugin|
+      let possible_match = $"cargo search --limit 1 ($plugin)" | str substring (str index-of $plugin)..(str index-of " ")
+      if possible_match = $plugin {
+        cargo install $plugin
+      }
+    }
+  } catch {
+    "Failed to install some plugins via `cargo install...`\r\nPlease make sure all plugins are installable via `cargo`"
+  }
 }
 
 ############################################
