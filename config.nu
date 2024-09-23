@@ -284,10 +284,11 @@ $env.config = {
 
   hooks: {
     pre_prompt: [
-      {
-        condition: { history | reverse | first 1 | get command | $in.0 =~ 'plugin add' }
-        code: "plugin list | select name version | transpose --ignore-titles -r -d | to json | print $in" 
-      }
+      {null}
+      # {
+      #   condition: { history | reverse | first 1 | get command | $in.0 =~ 'plugin add' }
+      #   code: "plugin list | select name version | transpose --ignore-titles -r -d | to json | print $in" 
+      # }
     ] # run before the prompt is shown
     pre_execution: [{ null }] # run before the repl input is run
     env_change: {
