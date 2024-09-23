@@ -297,8 +297,8 @@ $env.config = {
           }
       ] # run if the PWD environment is different since the last repl input
     }
-    display_output: { if (term size).columns >= 100 { table -ed 1 } else { table } }
-    command_not_found: {null}
+    display_output: "if (term size).columns >= 100 { table -e } else { table }" # run to display the output of a pipeline
+    command_not_found: { } # return an error message when a command is not found
   }
 
   menus: [
@@ -1072,46 +1072,46 @@ def --env refreshenv [] {
     $env.path = $out
 }
 
-def "plugin create lockfile" [] {
-  const lockfile = $"($nu.default-config-dir)/nu-lock.json"
+# def "plugin create lockfile" [] {
+#   const lockfile = $"($nu.default-config-dir)/nu-lock.json"
+#
+#   if (lockfile_exists | path exists) {
+#     plugin update lockfile
+#     return
+#   }
+#
+#   # Save current plugins to a lockfile
+#   plugin list | select name version | transpose --ignore-titles -rd | to json | save nu-lock.json
+# }
 
-  if (lockfile_exists | path exists) {
-    plugin update lockfile
-    return
-  }
+# def "plugin update lockfile" [] {
+#   const lockfile = $"($nu.default-config-dir)/nu-lock.json"
+#   const plugins = plugin list | select name version | transpose --ignore-titles -rd
+#
+#   # TODO: Handle going through this better instead of just merging. 
+#   # I.E: Handle removal of plugins
+#   $lockfile | merge $plugins | to json | save nu-lock.json -f
+# }
 
-  # Save current plugins to a lockfile
-  plugin list | select name version | transpose --ignore-titles -rd | to json | save nu-lock.json
-}
-
-def "plugin update lockfile" [] {
-  const lockfile = $"($nu.default-config-dir)/nu-lock.json"
-  const plugins = plugin list | select name version | transpose --ignore-titles -rd
-
-  # TODO: Handle going through this better instead of just merging. 
-  # I.E: Handle removal of plugins
-  $lockfile | merge $plugins | to json | save nu-lock.json -f
-}
-
-def "plugin install" [] {
-  const lockfile = $"($nu.default-config-dir)/nu-lock.json"
-  let plugins = each $lockfile | transpose name version | { |plugin| 
-    mut arr = []
-    arr | insert $"nu_plugin_($plugin.name)"
-  }
-
-  #TODO: Find a way to know if plugin is available in cargo before trying to install it.
-  try {
-    $plugins | each { |plugin|
-      let possible_match = $"cargo search --limit 1 ($plugin)" | str substring (str index-of $plugin)..(str index-of " ")
-      if possible_match = $plugin {
-        cargo install $plugin
-      }
-    }
-  } catch {
-    "Failed to install some plugins via `cargo install...`\r\nPlease make sure all plugins are installable via `cargo`"
-  }
-}
+# def "plugin install" [] {
+#   const lockfile = $"($nu.default-config-dir)/nu-lock.json"
+#   let plugins = each $lockfile | transpose name version | { |plugin| 
+#     mut arr = []
+#     arr | insert $"nu_plugin_($plugin.name)"
+#   }
+#
+#   #TODO: Find a way to know if plugin is available in cargo before trying to install it.
+#   try {
+#     $plugins | each { |plugin|
+#       let possible_match = $"cargo search --limit 1 ($plugin)" | str substring (str index-of $plugin)..(str index-of " ")
+#       if possible_match = $plugin {
+#         cargo install $plugin
+#       }
+#     }
+#   } catch {
+#     "Failed to install some plugins via `cargo install...`\r\nPlease make sure all plugins are installable via `cargo`"
+#   }
+# }
 
 ############################################
 #### Adding Commands to the Sort Module ####
