@@ -110,6 +110,7 @@ path add ($env.PATH | path join 'C:\Utilities\StrawberryPerl\perl\bin')
 path add ($env.PATH | path join $env.NUPM_HOME "scripts")
 path add ($env.PATH | path join $env.NUPM_HOME "bin" "plugins")
 
+$env.DPI = 110
 $env.GOPATH = 'C:\Users\bwilliams\go\'
 $env.PNPM_HOME = 'C:\Users\bwilliams\AppData\Local\pnpm\'
 $env.YAZI_CONFIG_HOME = 'C:\Users\bwilliams\.config\yazi\'
