@@ -221,17 +221,16 @@ $env.config = {
   cursor_shape: {
     emacs: line # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (line is the default)
     vi_insert: blink_block # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (block is the default)
-    vi_normal: block # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (underscore is the default)
+    vi_normal: underscore # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (underscore is the default)
   }
 
   color_config: $dark_theme # if you want a more interesting theme, you can replace the empty record with `$dark_theme`, `$light_theme` or another custom record
-  use_grid_icons: true
-  footer_mode: "25" # always, never, number_of_rows, auto
+  footer_mode: 25 # always, never, number_of_rows, auto
   float_precision: 2 # the precision for displaying floats in tables
   buffer_editor: "nvim" # command that will be used to edit the current line buffer with ctrl+o, if unset fallback to $env.EDITOR and $env.VISUAL
   use_ansi_coloring: true
   bracketed_paste: true # enable bracketed paste, currently useless on windows
-  edit_mode: vi # emacs, vi
+  edit_mode: emacs # emacs, vi
   shell_integration: {
     # osc2 abbreviates the path if in the home_dir, sets the tab/window title, shows the running command in the tab/window title
     osc2: true
@@ -294,7 +293,6 @@ $env.config = {
     env_change: {
       PWD: [
           {|before, after| 
-            try { print (ls | sort-by -i type name | grid -c) }
           }
       ] # run if the PWD environment is different since the last repl input
     }
@@ -951,6 +949,11 @@ alias core-vim = vim
 alias vim = nvim
 alias nv = neovide
 
+def tvim [name: string, args] {
+  $env.NVIM_APPNAME = $name
+  nvim $args
+}
+
 def nu-treesitter-highlights [] {
   let remote = "https://raw.githubusercontent.com/nushell/tree-sitter-nu/main/queries/nu/"
   let local = (
@@ -972,6 +975,66 @@ def edit-vars [] {
     rundll32.exe sysdm.cpl,EditEnvironmentVariables
   } else {
     echo "Warning: Unix systems do not usually include GUI editors for Environment Variables. \n Exiting... Command"
+  }
+}
+
+def --env "open env" [] {
+  try { open .env } catch { error make {msg: $"No `.env` file was found in directory: (pwd)", } }
+
+  open .env | lines
+    | split column "="
+    | each { |item| 
+      load-env { $item.column1: $item.column2 }
+
+      echo $"($env.JIRA_API)"
+    }
+}
+
+def "jira create issue" [
+  --project (-p): string
+  --summary: string
+  --description: string
+  --issue-type (-t): string
+  --assignee (-u): string
+  --priority (-p): string
+] {
+  let api_key = open env | $env.JIRA_API
+  let auth = ($"bwilliams@commsys.com:($api_key)" | encode base64)
+  let url = "https://commsys.atlassian.net/rest/api/3/issue"
+
+  let headers = [
+    [ "Authorization", $"Basic ($auth)"]
+    [ "Accept" "application/json" ]
+  ]
+
+  let body = {
+    fields: {
+      project: {
+        key: "PROJECT_KEY"
+      },
+      summary: "Create Jira task via API",
+      issuetype: {
+        name: "Task"
+      },
+      description: {
+        type: "doc",
+        version: 1,
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                text: "This task was created via the Jira API.",
+                type: "text"
+              }
+            ]
+          }
+        ]
+      },
+      priority: {
+        name: "Medium"
+      }
+    }
   }
 }
 
