@@ -6,6 +6,12 @@
 # https://www.nushell.sh/book/coloring_and_theming.html
 # And here is the theme collection
 # https://github.com/nushell/nu_scripts/tree/main/themes
+mut is_ocs133_enabled = true
+
+if "TERM_PROGRAM" in $env {
+  $is_ocs133_enabled = false
+}
+
 let dark_theme = {
   # color for nushell primitives
   separator: white
@@ -220,8 +226,8 @@ $env.config = {
 
   cursor_shape: {
     emacs: line # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (line is the default)
-    vi_insert: blink_block # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (block is the default)
-    vi_normal: underscore # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (underscore is the default)
+    vi_insert: line # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (block is the default)
+    vi_normal: block # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (underscore is the default)
   }
 
   color_config: $dark_theme # if you want a more interesting theme, you can replace the empty record with `$dark_theme`, `$light_theme` or another custom record
@@ -246,7 +252,7 @@ $env.config = {
     # 133;C - Mark pre-execution
     # 133;D;exit - Mark execution finished with exit code
     # This is used to enable terminals to know where the prompt is, the command is, where the command finishes, and where the output of the command is
-    osc133: false
+    osc133: $is_ocs133_enabled
     # osc633 is closely related to osc133 but only exists in visual studio code (vscode) and supports their shell integration features
     # 633;A - Mark prompt start
     # 633;B - Mark prompt end
@@ -275,29 +281,20 @@ $env.config = {
     plugins: {
       # alternate configuration for specific plugins, by name, for example:
       #
-      # gstat: {
-      #     enabled: false
-      # }
+      gstat: {
+          enabled: true
+      }
     }
   }
 
   hooks: {
-    pre_prompt: [
-      {null}
-      # {
-      #   condition: { history | reverse | first 1 | get command | $in.0 =~ 'plugin add' }
-      #   code: "plugin list | select name version | transpose --ignore-titles -r -d | to json | print $in" 
-      # }
-    ] # run before the prompt is shown
+    pre_prompt: [{null}] # run before the prompt is shown
     pre_execution: [{ null }] # run before the repl input is run
     env_change: {
-      PWD: [
-          {|before, after| 
-          }
-      ] # run if the PWD environment is different since the last repl input
+      PWD: [ {|before, after| null }] # run if the PWD environment is different since the last repl input
     }
     display_output: "if (term size).columns >= 100 { table -e } else { table }" # run to display the output of a pipeline
-    command_not_found: { } # return an error message when a command is not found
+    command_not_found: { null } # return an error message when a command is not found
   }
 
   menus: [
@@ -935,7 +932,12 @@ source ~/.config/.zoxide.nu
 source ./completions/git-completions.nu
 source ./completions/rg-completions.nu
 source ./menus/zoxide-menu.nu
-use ~/.cache/starship/init.nu
+
+if "TERM_PROGRAM" in $env {
+  if $env.TERM_PROGRAM != "Rider" {
+    use ~/.cache/starship/init.nu
+  }
+}
 
 # Create a backup of the BASE CD command
 alias core-cd = cd
@@ -970,8 +972,7 @@ def nu-treesitter-highlights [] {
 
 def edit-vars [] {
   let host = sys host | get name
-
-  if host == 'Windows' {
+  if $host == "Windows" {
     rundll32.exe sysdm.cpl,EditEnvironmentVariables
   } else {
     echo "Warning: Unix systems do not usually include GUI editors for Environment Variables. \n Exiting... Command"

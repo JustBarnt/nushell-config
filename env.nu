@@ -101,23 +101,23 @@ use std "path add"
 # path add ($env.HOME | path join ".local" "bin")
 # $env.PATH = ($env.PATH | uniq)
 
-path add ($env.PATH | path join 'C:\PHP\')
-path add ($env.PATH | path join 'C:\Utilities\')
-path add ($env.PATH | path join 'C:\Utilities\Tools\')
 path add ($env.PATH | path join 'D:\CommSys\Utilities\DbManager\.bin')
 path add ($env.PATH | path join 'C:\Utilities\SysinternalsSuite\')
 path add ($env.PATH | path join 'C:\Utilities\StrawberryPerl\perl\bin')
-path add ($env.PATH | path join $env.NUPM_HOME "scripts")
-path add ($env.PATH | path join $env.NUPM_HOME "bin" "plugins")
+
+$env.BAT_CONFIG_PATH = '~/.config/bat/'
+$env.YAZI_CONFIG_HOME = '~/.config/yazi/'
+$env.TELEVISION_CONFIG = 'C:\Users\bwilliams\.config\television\'
 
 $env.GOPATH = 'C:\Users\bwilliams\go\'
 $env.PNPM_HOME = 'C:\Users\bwilliams\AppData\Local\pnpm\'
-$env.YAZI_CONFIG_HOME = 'C:\Users\bwilliams\.config\yazi\'
+$env.BAT_PAGER = 'less -RF'
 $env.YAZI_FILE_ONE = 'C:\Program Files\Git\usr\bin\file.exe'
-$env.EDITOR = 'neovide'
+
+$env.EDITOR = 'nvim'
 $env.WEZTERM_LOG = "debug wezterm"
 
 # To load from a custom file you can use:
-# source ($nu.default-config-dir | path join 'custom.nu')
+# source ()
 zoxide init nushell | save -f ~/.config/.zoxide.nu
 starship init nu | save -f ~/.cache/starship/init.nu
