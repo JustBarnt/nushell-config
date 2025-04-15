@@ -143,7 +143,7 @@ alias core-vim = vim
 alias vim = nvim
 alias nv = neovide
 
-def tvim [name: string, args] {
+def usevim [name: string, args] {
   $env.NVIM_APPNAME = $name
   nvim $args
 }
