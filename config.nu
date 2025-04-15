@@ -1,5 +1,4 @@
 # Nushell Config File
-#
 # version = "0.95.0"
 
 # For more information on defining custom themes, see
@@ -220,8 +219,7 @@ $env.config = {
   }
 
   filesize: {
-    metric: false # true => KB, MB, GB (ISO standard), false => KiB, MiB, GiB (Windows standard)
-    format: "auto" # b, kb, kib, mb, mib, gb, gib, tb, tib, pb, pib, eb, eib, auto
+    unit: binary
   }
 
   cursor_shape: {
@@ -236,7 +234,7 @@ $env.config = {
   buffer_editor: "nvim" # command that will be used to edit the current line buffer with ctrl+o, if unset fallback to $env.EDITOR and $env.VISUAL
   use_ansi_coloring: true
   bracketed_paste: true # enable bracketed paste, currently useless on windows
-  edit_mode: emacs # emacs, vi
+  edit_mode: vi # emacs, vi
   shell_integration: {
     # osc2 abbreviates the path if in the home_dir, sets the tab/window title, shows the running command in the tab/window title
     osc2: true
@@ -931,6 +929,7 @@ $env.config = {
 source ~/.config/.zoxide.nu
 source ./completions/git-completions.nu
 source ./completions/rg-completions.nu
+source ./completions/zoxide-completions.nu
 source ./menus/zoxide-menu.nu
 
 if "TERM_PROGRAM" in $env {

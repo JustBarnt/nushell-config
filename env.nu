@@ -3,7 +3,7 @@
 # version = "0.95.0"
 
 def create_left_prompt [] {
-    let dir = match (do --ignore-shell-errors { $env.PWD | path relative-to $nu.home-path }) {
+    let dir = match (do { $env.PWD | path relative-to $nu.home-path }) {
         null => $env.PWD
         '' => '~'
         $relative_pwd => ([~ $relative_pwd] | path join)
@@ -108,6 +108,7 @@ path add ($env.PATH | path join 'C:\Utilities\StrawberryPerl\perl\bin')
 $env.BAT_CONFIG_PATH = '~/.config/bat/'
 $env.YAZI_CONFIG_HOME = '~/.config/yazi/'
 $env.TELEVISION_CONFIG = 'C:\Users\bwilliams\.config\television\'
+$env.OPENSSL_DIR = 'C:\Users\bwilliams\scoop\apps\openssl\current\bin\'
 
 $env.GOPATH = 'C:\Users\bwilliams\go\'
 $env.PNPM_HOME = 'C:\Users\bwilliams\AppData\Local\pnpm\'
@@ -116,6 +117,7 @@ $env.YAZI_FILE_ONE = 'C:\Program Files\Git\usr\bin\file.exe'
 
 $env.EDITOR = 'nvim'
 $env.WEZTERM_LOG = "debug wezterm"
+$env.SQL_EDITOR = "nvim"
 
 # To load from a custom file you can use:
 # source ()
