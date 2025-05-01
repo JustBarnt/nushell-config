@@ -104,7 +104,6 @@ $env.SQL_EDITOR = "nvim"
 $env.DOTNET_UPGRADEASSISTANT_TELEMETRY_OPTOUT = 1
 $env.JIRA_CASE_DIR = "D:/CommSys/Projects/JIRA/Logs/"
 $env.JIRA_ATTACHMENTS_DIR = "G:/Support/JIRA Attachments/"
-$env.GLAZEWM_CONFIG_PATH = "C:/Users/bwilliams/.config/glazewm/glazewm/config.yaml"
 
 # To load from a custom file you can use:
 # source ()
