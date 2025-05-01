@@ -171,6 +171,48 @@ def edit-vars [] {
   }
 }
 
+def "peek logs" [path: string]  {
+  match ($env.JIRA_ATTACHMENTS_DIR == null) {
+    true => {
+      error make {
+        msg: $"Missing environment variables: JIRA_ATTACHMENTS_DIR", 
+      }
+    },
+    false => {
+      let case_dir = $path | str upcase
+      $env.JIRA_ATTACHMENTS_DIR | path join $case_dir | ls $in
+    }
+  }
+}
+
+def "copy logs" [path: string] {
+  match ($env.JIRA_CASE_DIR == null or $env.JIRA_ATTACHMENTS_DIR == null) {
+    true => {
+      error make {
+        msg: $"Missing one or more of the following environment variables: JIRA_CASE_DIR, JIRA_ATTACHMENTS_DIR", 
+      }
+    },
+    false => {
+      if not ($env.JIRA_CASE_DIR | path exists) {
+        print $"(ansi green_bold)JIRA_CASE_DIR not found."
+        print $"Creating directories...(ansi reset)"
+        mkdir $env.JIRA_CASE_DIR
+      }
+
+      let case_dir = $path | str upcase
+
+      let copy_path = $env.JIRA_ATTACHMENTS_DIR | path join $case_dir
+
+      let log_name = fd -tf Clear.log $copy_path | path basename
+      let log_path = $copy_path | path join $log_name
+
+      let output_path = $env.JIRA_CASE_DIR | path join $'($case_dir)Clear.log'
+
+      cp $log_path $output_path
+    }
+  }
+}
+
 def "start clips" [path?: string = "CLIPS"] {
   # TODO:CHECK IF PATH IS VALID
   let clips_dir = $'D:\CommSys\CLIPS'
@@ -185,7 +227,7 @@ def "start clips" [path?: string = "CLIPS"] {
       error make {
         msg: "Path does not exists", 
         label: {
-        text: $"Could not change directories to: \n($clips_dir)($path)\\Application",
+          text: $"Could not change directories to: \n($clips_dir)($path)\\Application",
           span: $span
         }
       }

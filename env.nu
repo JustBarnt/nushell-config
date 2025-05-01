@@ -101,6 +101,10 @@ $env.EDITOR = 'nvim'
 $env.WEZTERM_LOG = "debug wezterm"
 $env.SQL_EDITOR = "nvim"
 
+$env.DOTNET_UPGRADEASSISTANT_TELEMETRY_OPTOUT = 1
+$env.JIRA_CASE_DIR = "D:/CommSys/Projects/JIRA/Logs/"
+$env.JIRA_ATTACHMENTS_DIR = "G:/Support/JIRA Attachments/"
+
 # To load from a custom file you can use:
 # source ()
 zoxide init nushell | save -f ~/.config/.zoxide.nu
