@@ -262,6 +262,14 @@ def --env refreshenv [] {
     $env.path = $out
 }
 
+def "count tags" [patterns: list<string>] {
+  for pat in $patterns {
+      let count = rg -o $pat | wc -l
+
+    return { pattern: $pat found: $count }
+  }
+}
+
 ############################################
 #### Adding Commands to the Sort Module ####
 ############################################
