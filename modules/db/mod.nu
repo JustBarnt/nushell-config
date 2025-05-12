@@ -19,82 +19,53 @@ export def --env main [
   match $command {
     "patch" => {
       if (which fd | length | $in == 0) {
-        print "`fd` was not found on the system, please install fd with `scoop install fd` first."
-        exit
+        print $"(ansi red_bold)`fd`(ansi reset) was not found on the system, please install fd with (ansi blue_underlined)`scoop install fd` first.(ansi reset)"
+        return
       }
 
       let match: list<string> = sys disks | get mount | par-each {|disk|
-        let stdout: string = fd -tf New-ClipsPatch.ps1 | complete | get stdout
+        let stdout: string = fd -tf New-ClipsPatch.ps1 | complete | get stdout | path expand
         return $stdout
       }
       if ($match != "") {
-        pwsh -c New-ClipsPatch.ps1
+        pwsh -c $match
       } else {
-        error make {
-          msg: "Unable to find a New-ClipsPatch.ps1 file on the system."
-        }
+        error make { msg: "Unable to find a New-ClipsPatch.ps1 file on the system." }
       }
     },
     "sync" => {
       let is_git_dir = (".git" | path exists)
-      let is_svn_dir = (".svn" | path exists)
 
-      db-export $name
+      if ($name != null) {
+        dbmanager export-content --database=$"($name)"
+      } else { 
+        dbmanager export-content
+      }
 
       if $is_git_dir {
-        let res = git_update | complete
-        match $res.exit_code {
-          0 => {
-            db-import $name
-          },
-          1 => {
-            db-import $name
-          },
-          _ => {
-            error make { msg: $"Something horrible went wrong, ERROR: ($res.stderr)" }
-          }
+        print $"(ansi uu)Export finished - Stashing any changes and updating working copy...(ansi reset)"
+        # stash content
+        git stash
+        # fetch content
+        git fetch origin dev
+        # rebase content
+        git rebase
+
+        # apply stash if `git stash list` has a stdout value
+        if (git stash list | complete | $in.stdout != "") {
+          print $"(ansi uu)Applying stashed changes...(ansi reset)"
+          git stash pop
         }
       } else {
-        svn_update
-        db-import $name
+        print $"(ansi bu)Export finished - updating working copy...(ansi reset)"
+        svn update
+      }
+
+      if ($name != null) {
+        dbmanager import-content --database=$"($name)"
+      } else { 
+        dbmanager import-content
       }
     }
   }
-}
-
-# Exports the database
-def db-export [name?: string] {
-  if ($env.PWD =~ "CLIPS") {
-    print "Exporting CLIPS Database..."
-    if ($name != null) { dbmanager export-content --database=$name }
-  } else {
-    print "Exporting COMMSYS Database..."
-    if ($name == null) { dbmanager export-content }
-  }
-}
-
-# Imports the database
-def db-import [name?: string] {
-  if ($env.PWD =~ "CLIPS") {
-    print "Importing CLIPS Database... This WILL take a while..."
-    dbmanager import-content --database=$name
-  } else {
-    print "Importing COMMSYS Database..."
-    dbmanager import-content
-  }
-  print "Import complete! Make sure commit any changes!"
-}
-
-# Runs git: [stash, fetch, rebase, and stash pop]
-def git_update [] {
-  print "Export finished - Stashing any changes and updating working copy..."
-  git stash; git fetch; git rebase
-  print "Working copy updated! Applying stash..."
-  git stash pop
-}
-
-# Runs svn: [update]
-def svn_update [] {
-  print "Export finished - updating working copy..."
-  svn update
 }
