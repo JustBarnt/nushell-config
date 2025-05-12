@@ -115,7 +115,7 @@ $env.config.hooks = {
     }
     display_output: "if (term size).columns >= 100 { table -e } else { table }" # run to display the output of a pipeline
     command_not_found: { null } # return an error message when a command is not found
-  }
+}
 
 source ./.zoxide.nu
 
@@ -130,6 +130,10 @@ source ./completions/zoxide-completions.nu
 
 # Custom Completion Menus
 source ./menus/zoxide-menu.nu
+
+# Custom Modules
+use modules\warp
+use modules\db\
 
 # Create a backup of the BASE CD command
 alias core-cd = cd
