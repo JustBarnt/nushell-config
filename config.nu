@@ -133,7 +133,8 @@ source ./menus/zoxide-menu.nu
 
 # Custom Modules
 use modules\warp
-use modules\db\
+use modules\db
+use modules\docs
 
 # Create a backup of the BASE CD command
 alias core-cd = cd
@@ -175,6 +176,8 @@ def edit-vars [] {
   }
 }
 
+
+# TODO: Sometimes the logs are in a folder inside the case, need to handle this somehow 🙃
 def "peek logs" [path: string]  {
   match ($env.JIRA_ATTACHMENTS_DIR == null) {
     true => {

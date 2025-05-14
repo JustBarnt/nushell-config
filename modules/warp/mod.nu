@@ -1,7 +1,7 @@
 def locations [] {
   {
     options: { case_sensitive: false, completion_algorithm: prefix, positional: true, sort: true },
-    completions: ["asinc", "ccic", "ccicdb", "clips", "clipsdb", "xmlapi",] 
+    completions: ["asinc", "ccic", "ccicdb", "clips", "clipsdb", "docs", "xmlapi"] 
   }
 }
 
@@ -21,6 +21,9 @@ export def --env main [prefix: string@locations] {
     },
     "clipsdb" => {
       cd D:/CommSys/CLIPS/Database-1/
+    },
+    "docs" => {
+      cd D:/CommSys/ConnectCIC_SVN/ConnectCicDevDocs/
     },
     "xmlapi" => {
       cd D:/CommSys/ConnectCIC/XmlApi/
