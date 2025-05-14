@@ -120,8 +120,7 @@ $env.config.hooks = {
 source ./.zoxide.nu
 
 # Custom Completion Sources
-
-# Custom Completion Sources
+source ./completions/scoop-completions.nu
 source ./completions/cargo-completions.nu
 source ./completions/dotnet-completions.nu
 source ./completions/git-completions.nu
