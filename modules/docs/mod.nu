@@ -13,40 +13,44 @@ export def edit [
 interface: string@interfaces, # List of available Developer Documents to lock
 message: string # Lock message
 ] {
-  let regexp = `(?<flags>^.{9})\s+(?<wc_rev>\d+)\s+(?<rm_rev>\d+)\s+(?<author>\w+)\s+(?<file>.*)`
-  let status_table: table = svn status -v $"($interface).htm" | parse -r $regexp
-  let flags: list<string> = $status_table | $in.flags.0
+  let status_table: table = svn status -v $"($interface).htm" | parse -r `(?<flags>^.{9})\s+(?<wc_rev>\d+)\s+(?<rm_rev>\d+)\s+(?<author>\w+)\s+(?<file>.*)`
+  let flags: string = $status_table | $in.flags.0
 
   let lock_status = parse-status-message $flags
-  let can_continue: bool = match $lock_status {
-    1 => true,
-    2 => false,
-    3 => false
+  
+  print $"File Locked: ($lock_status)"
+
+  match $lock_status {
+    1 => {
+      svn update
+      svn lock -m $"($message)" $"./($interface).htm" $"./($interface)_files/**"
+
+      `C:\Program Files\Microsoft Office\Office16\WINWORD.EXE` $"($interface).htm"
+    },
+    _ => {
+      print $"Interface: (ansi bold_blue)($interface)(ansi reset) is already locked"
+    },
   }
-
-  if not $can_continue {
-    print $"Interface: (ansi bold_blue)$(interface)(ansi reset) is already locked"
-  }
-
-  let command_status = svn lock -m $"($message)" $"($interface).htm ($interface)_files" | complete
-
-  if $command_status.exit_code > 0 {
-    error make { msg: $"Something went wrong while attempting to lock interface: ($interface)\nError:($command_status.stderror)" }
-  }
-
-  `C:\Program Files\Microsoft Office\Office16\WINWORD.EXE` $"($interface).htm"
 }
 
-def parse-status-message [flags: list<string>]: any -> int {
+export def save [
+interface: string@interfaces, 
+message: string
+] {
+  svn commit -m $"($message)" $"./($interface).htm" $"./($interface)_files/**"
+}
+
+def parse-status-message [flags: string]: any -> int {
   let STATUS = {
     FREE:           1,
     TAKEN:          2,
     ALREADY_LOCKED: 3
   }
 
-  let has_local_lock: bool = $flags | str substring 5..5 == 'K'
-  let has_remote_lock: bool = $flags | str substring 2..2 == 'L'
+  let has_local_lock: bool = $flags | str contains "K"
+  let has_remote_lock: bool = $flags | str contains "L"
 
   if $has_remote_lock { return $STATUS.TAKEN }
   if $has_local_lock { return $STATUS.ALREADY_LOCKED }
+  return $STATUS.FREE
 }
