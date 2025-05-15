@@ -25,7 +25,7 @@ message: string # Lock message
   }
 
   if not $can_continue {
-    print $"Interface: (ansi bold_blue)$(interface)(ansi reset) is already locked by you"
+    print $"Interface: (ansi bold_blue)$(interface)(ansi reset) is already locked"
   }
 
   let command_status = svn lock -m $"($message)" $"($interface).htm ($interface)_files" | complete

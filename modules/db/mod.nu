@@ -48,6 +48,9 @@ export def --env main [
         git stash
         # fetch content
         git fetch origin dev
+        if $env.LAST_EXIT_CODE == 128 {
+          git fetch origin dev
+        }
         # rebase content
         git rebase
 
