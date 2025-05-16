@@ -81,7 +81,7 @@ $env.config.shell_integration = {
   osc7: true
   osc8: true
   osc9_9: false
-  osc133: $is_ocs133_enabled
+  osc133: true #$is_ocs133_enabled
   osc633: true
   reset_application_mode: true
 }
