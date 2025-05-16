@@ -104,6 +104,8 @@ $env.SQL_EDITOR = "nvim"
 $env.DOTNET_UPGRADEASSISTANT_TELEMETRY_OPTOUT = 1
 $env.JIRA_CASE_DIR = "D:/CommSys/Projects/JIRA/Logs/"
 $env.JIRA_ATTACHMENTS_DIR = "G:/Support/JIRA Attachments/"
+$env.TOPIARY_CONFIG_FILE = ($env.XDG_CONFIG_HOME | path join topiary languages.ncl)
+$env.TOPIARY_LANGUAGE_DIR = ($env.XDG_CONFIG_HOME | path join topiary languages)
 
 # To load from a custom file you can use:
 # source ()

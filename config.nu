@@ -20,53 +20,53 @@
 mut is_ocs133_enabled = true
 
 if "TERM_PROGRAM" in $env {
-    # Disable ocs133 in WEZTERM. Everytime you type a character it inserts a new
-    # line into the terminal
-    $is_ocs133_enabled = false
+  # Disable ocs133 in WEZTERM. Everytime you type a character it inserts a new
+  # line into the terminal
+  $is_ocs133_enabled = false
 
-    # If we are in Rider, don't use starship
-    if $env.TERM_PROGRAM != "Rider" {
-        use ~/.cache/starship/init.nu
-    }
+  # If we are in Rider, don't use starship
+  if $env.TERM_PROGRAM != "Rider" {
+    use ~/.cache/starship/init.nu
+  }
 }
 
 $env.config.show_banner = false
 $env.config.filesize.unit = "binary"
 $env.config.table = {
-    mode: rounded
-    index_mode: auto
-    show_empty: true
-    padding: { left: 1, right: 1 }
-    trim: {
-        methodology: wrapping
-        wrapping_try_keep_words: true
-        truncating_suffix: "..."
-    }
-    header_on_separator: false
+  mode: rounded
+  index_mode: auto
+  show_empty: true
+  padding: {left: 1 right: 1}
+  trim: {
+    methodology: wrapping
+    wrapping_try_keep_words: true
+    truncating_suffix: "..."
+  }
+  header_on_separator: false
 }
 $env.config.error_style = "fancy"
 $env.config.rm.always_trash = true
 $env.config.ls = {
-    use_ls_colors: true
-    clickable_links: true
+  use_ls_colors: true
+  clickable_links: true
 }
 $env.config.history = {
-    max_size: 100_000
-    sync_on_enter: true
-    file_format: "sqlite"
-    isolation: true
+  max_size: 5_000_000
+  sync_on_enter: true
+  file_format: "sqlite"
+  isolation: true
 }
 $env.config.completions = {
-    case_sensitive: false
-    quick: true
-    partial: false
-    algorithm: "prefix"
-    external: {
-        enable: true
-        max_results: 100
-        completer: null
-    }
-    use_ls_colors: true
+  case_sensitive: false
+  quick: true
+  partial: false
+  algorithm: "prefix"
+  external: {
+    enable: true
+    max_results: 100
+    completer: null
+  }
+  use_ls_colors: true
 }
 $env.config.cursor_shape.vi_insert = "line"
 $env.config.cursor_shape.vi_normal = "block"
@@ -77,13 +77,13 @@ $env.config.use_ansi_coloring = true
 $env.config.bracketed_paste = true
 $env.config.edit_mode = "vi"
 $env.config.shell_integration = {
-    osc2: true
-    osc7: true
-    osc8: true
-    osc9_9: false
-    osc133: $is_ocs133_enabled
-    osc633: true
-    reset_application_mode: true
+  osc2: true
+  osc7: true
+  osc8: true
+  osc9_9: false
+  osc133: $is_ocs133_enabled
+  osc633: true
+  reset_application_mode: true
 }
 $env.config.render_right_prompt_on_last_line = true
 $env.config.use_kitty_protocol = true
@@ -91,30 +91,30 @@ $env.config.highlight_resolved_externals = true
 $env.config.recursion_limit = 50
 $env.config.plugins = {}
 $env.config.plugin_gc = {
-    default: {
-        enabled: true
-        stop_after: 10sec
+  default: {
+    enabled: true
+    stop_after: 10sec
+  }
+  plugins: {
+    gstat: {
+      enabled: true
     }
-    plugins: {
-        gstat: {
-            enabled: true
-        }
-        query: {
-            enabled: true
-        }
-        formats: {
-            enabled: true
-        }
+    query: {
+      enabled: true
     }
+    formats: {
+      enabled: true
+    }
+  }
 }
 $env.config.hooks = {
-    pre_prompt: [{null}] # run before the prompt is shown
-    pre_execution: [{ null }] # run before the repl input is run
-    env_change: {
-      PWD: [ {|before, after| null }] # run if the PWD environment is different since the last repl input
-    }
-    display_output: "if (term size).columns >= 100 { table -e } else { table }" # run to display the output of a pipeline
-    command_not_found: { null } # return an error message when a command is not found
+  pre_prompt: [{ null }] # run before the prompt is shown
+  pre_execution: [{ null }] # run before the repl input is run
+  env_change: {
+    PWD: [{|before, after| null }] # run if the PWD environment is different since the last repl input
+  }
+  display_output: "if (term size).columns >= 100 { table -e } else { table }" # run to display the output of a pipeline
+  command_not_found: { null } # return an error message when a command is not found
 }
 
 source ./.zoxide.nu
@@ -134,6 +134,8 @@ source ./menus/zoxide-menu.nu
 use modules\warp
 use modules\db
 use modules\docs
+use modules\msvs
+use modules\expand
 
 # Create a backup of the BASE CD command
 alias core-cd = cd
@@ -175,15 +177,14 @@ def edit-vars [] {
   }
 }
 
-
 # TODO: Sometimes the logs are in a folder inside the case, need to handle this somehow 🙃
-def "peek logs" [path: string]  {
+def "peek logs" [path: string] {
   match ($env.JIRA_ATTACHMENTS_DIR == null) {
     true => {
       error make {
-        msg: $"Missing environment variables: JIRA_ATTACHMENTS_DIR", 
+        msg: $"Missing environment variables: JIRA_ATTACHMENTS_DIR"
       }
-    },
+    }
     false => {
       let case_dir = $path | str upcase
       $env.JIRA_ATTACHMENTS_DIR | path join $case_dir | ls $in
@@ -195,9 +196,9 @@ def "copy logs" [path: string] {
   match ($env.JIRA_CASE_DIR == null or $env.JIRA_ATTACHMENTS_DIR == null) {
     true => {
       error make {
-        msg: $"Missing one or more of the following environment variables: JIRA_CASE_DIR, JIRA_ATTACHMENTS_DIR", 
+        msg: $"Missing one or more of the following environment variables: JIRA_CASE_DIR, JIRA_ATTACHMENTS_DIR"
       }
-    },
+    }
     false => {
       if not ($env.JIRA_CASE_DIR | path exists) {
         print $"(ansi green_bold)JIRA_CASE_DIR not found."
@@ -228,12 +229,12 @@ def "start clips" [path?: string = "CLIPS"] {
     true => {
       cd $'($clips_dir)\($path)\Application'
       ./console/cake.bat server -H 127.0.0.1 -p 80
-    },
+    }
     false => {
       error make {
-        msg: "Path does not exists", 
+        msg: "Path does not exists"
         label: {
-          text: $"Could not change directories to: \n($clips_dir)($path)\\Application",
+          text: $"Could not change directories to: \n($clips_dir)($path)\\Application"
           span: $span
         }
       }
@@ -251,28 +252,26 @@ def glog [count: int] {
 }
 
 def "ternary closure" [condition: closure, first: any, second: any]: any -> any {
-  if (do $condition) {$first} else {$second}
+  if (do $condition) { $first } else { $second }
 }
 
 def "ternary boolean" [condition: bool, first: any, second: any]: any -> any {
-  if $condition {$first} else {$second}
+  if $condition { $first } else { $second }
 }
 
 def --env refreshenv [] {
-    let user_path = registry query --hkcu environment | where name == Path | get value | split row ';' |
-         where { |x| $x != '' }
-    let sys_path = registry query --hklm 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment' | where name == Path | get value | 
-        split row ';' | where { |x| $x != '' }
+  let user_path = registry query --hkcu environment | where name == Path | get value | split row ';' | where {|x| $x != '' }
+  let sys_path = registry query --hklm 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment' | where name == Path | get value | split row ';' | where {|x| $x != '' }
 
-    let out = $user_path ++ $sys_path ++ $env.path | uniq --ignore-case
-    $env.path = $out
+  let out = $user_path ++ $sys_path ++ $env.path | uniq --ignore-case
+  $env.path = $out
 }
 
 def "count tags" [patterns: list<string>] {
   for pat in $patterns {
-      let count = rg -o $pat | wc -l
+    let count = rg -o $pat | wc -l
 
-    return { pattern: $pat found: $count }
+    return {pattern: $pat found: $count}
   }
 }
 
@@ -282,10 +281,10 @@ def "count tags" [patterns: list<string>] {
 
 # Sorts Combinations Alphabetically then rebuilds the text file
 def "sort combinations" [
-  filename:string # The name of the file to sort items
+  filename: string # The name of the file to sort items
   skip_on: string = "-" # The character to skip sorting on, this should be some kind of special character such as "-,_,*"
 ] {
-  let lines = open $filename | decode utf-8 | lines 
+  let lines = open $filename | decode utf-8 | lines
   mut sorted_stream = []
 
   for $line in $lines {
