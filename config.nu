@@ -33,7 +33,7 @@ if "TERM_PROGRAM" in $env {
 $env.config.show_banner = false
 $env.config.filesize.unit = "binary"
 $env.config.table = {
-  mode: rounded
+  mode: heavy #reinforced
   index_mode: auto
   show_empty: true
   padding: {left: 1 right: 1}
