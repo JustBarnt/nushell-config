@@ -149,6 +149,16 @@ alias core-vim = vim
 alias vim = nvim
 alias nv = neovide
 
+def --env y [...args] {
+  let tmp = (mktemp -t "yazi-cwd.XXXXXX")
+  yazi ...$args --cwd-file $tmp
+  let cwd = (open $tmp)
+  if $cwd != "" and $cwd != $env.PWD {
+    cd $cwd
+  }
+  rm -fp $tmp
+}
+
 def usevim [name: string, args] {
   $env.NVIM_APPNAME = $name
   nvim $args
