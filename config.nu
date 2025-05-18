@@ -131,11 +131,11 @@ source ./completions/zoxide-completions.nu
 source ./menus/zoxide-menu.nu
 
 # Custom Modules
-use modules\warp
-use modules\db
-use modules\docs
-use modules\msvs
-use modules\expand
+use modules/warp
+use modules/db
+use modules/docs
+use modules/msvs
+use modules/expand
 
 # Create a backup of the BASE CD command
 alias core-cd = cd
