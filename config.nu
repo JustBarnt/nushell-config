@@ -117,7 +117,8 @@ $env.config.hooks = {
   command_not_found: { null } # return an error message when a command is not found
 }
 
-source ~/.zoxide.nu
+source ~/.local/share/zoxide/.zoxide.nu
+source ~/.local/share/atuin/init.nu
 
 # Custom Completion Sources
 source ./completions/scoop-completions.nu

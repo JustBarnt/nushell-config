@@ -111,5 +111,7 @@ $env._ZO_RESOLVE_SYMLINKS = 1
 
 # To load from a custom file you can use:
 # source ()
-zoxide init nushell | save -f ~/.zoxide.nu
-starship init nu | save -f ~/.cache/starship/init.nu
+
+# atuin init nu | save ~/.local/share/atuin/init.nu
+# zoxide init nushell | save ~/.local/share/zoxide/.zoxide.nu
+# starship init nu | save ~/.local/share/starship/init.nu
