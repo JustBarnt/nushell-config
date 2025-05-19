@@ -117,7 +117,7 @@ $env.config.hooks = {
   command_not_found: { null } # return an error message when a command is not found
 }
 
-source ./.zoxide.nu
+source ~/.zoxide.nu
 
 # Custom Completion Sources
 source ./completions/scoop-completions.nu
@@ -136,13 +136,6 @@ use modules/db
 use modules/docs
 use modules/msvs
 use modules/expand
-
-# Create a backup of the BASE CD command
-alias core-cd = cd
-
-# Alias Zoxide to CD
-alias cd = z
-alias cdi = zi
 
 # Alias VIM
 alias core-vim = vim

@@ -28,7 +28,7 @@ export def --env main [
         return $stdout
       }
       if ($match != "") {
-        pwsh -c $match
+        pwsh -c $"($match)"
       } else {
         error make { msg: "Unable to find a New-ClipsPatch.ps1 file on the system." }
       }
