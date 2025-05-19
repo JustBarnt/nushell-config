@@ -107,6 +107,8 @@ $env.JIRA_ATTACHMENTS_DIR = "G:/Support/JIRA Attachments/"
 $env.TOPIARY_CONFIG_FILE = ($env.XDG_CONFIG_HOME | path join topiary languages.ncl)
 $env.TOPIARY_LANGUAGE_DIR = ($env.XDG_CONFIG_HOME | path join topiary languages)
 
+$env._ZO_RESOLVE_SYMLINKS = 1
+
 # To load from a custom file you can use:
 # source ()
 zoxide init nushell | save -f ~/.zoxide.nu
