@@ -109,5 +109,5 @@ $env.TOPIARY_LANGUAGE_DIR = ($env.XDG_CONFIG_HOME | path join topiary languages)
 
 # To load from a custom file you can use:
 # source ()
-zoxide init nushell | save -f ~/.config/.zoxide.nu
+zoxide init nushell | save -f ~/.config/nushell/.zoxide.nu
 starship init nu | save -f ~/.cache/starship/init.nu

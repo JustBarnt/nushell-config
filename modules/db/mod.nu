@@ -47,8 +47,8 @@ export def --env main [
         # stash content
         git stash
         # fetch content
-        git fetch origin dev
-        if $env.LAST_EXIT_CODE == 128 {
+        let fetch_attempt = git fetch origin dev | complete
+        if $fetch_attempt.exit_code != 0 {
           git fetch origin dev
         }
         # rebase content
