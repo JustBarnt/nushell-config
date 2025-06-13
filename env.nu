@@ -83,7 +83,7 @@ $env.NU_PLUGIN_DIRS = [
 # which is built into the nushell stdlib:
 use std "path add"
 
-path add ($env.PATH | path join 'D:\CommSys\Utilities\DbManager\.bin')
+path add ($env.PATH | path join 'D:\CommSys\Tools\DbManager\.bin')
 path add ($env.PATH | path join 'C:\Utilities\SysinternalsSuite\')
 path add ($env.PATH | path join 'C:\Utilities\StrawberryPerl\perl\bin')
 path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/lsp/')
