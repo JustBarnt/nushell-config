@@ -43,7 +43,7 @@ export def --env main [
       }
 
       if $is_git_dir {
-        print $"(ansi uu)Export finished - Stashing any changes and updating working copy...(ansi reset)"
+        print $"(ansi bu)Export finished - Stashing any changes and updating working copy...(ansi reset)"
         # stash content
         git stash
         # fetch content
@@ -56,7 +56,7 @@ export def --env main [
 
         # apply stash if `git stash list` has a stdout value
         if (git stash list | complete | $in.stdout != "") {
-          print $"(ansi uu)Applying stashed changes...(ansi reset)"
+          print $"(ansi bu)Applying stashed changes...(ansi reset)"
           git stash pop
         }
       } else {
