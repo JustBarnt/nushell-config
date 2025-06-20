@@ -214,7 +214,7 @@ def "copy logs" [path: string] {
 
       let copy_path = $env.JIRA_ATTACHMENTS_DIR | path join $case_dir
 
-      let log_name = fd -tf Clear.log $copy_path | path basename
+      let log_name = fd -tf Clear.log --max-depth 1 $copy_path | path basename
       let log_path = $copy_path | path join $log_name
 
       let output_path = $env.JIRA_CASE_DIR | path join $'($case_dir)Clear.log'
