@@ -279,44 +279,9 @@ def "count tags" [patterns: list<string>] {
   }
 }
 
-############################################
-#### Adding Commands to the Sort Module ####
-############################################
-
-# Sorts Combinations Alphabetically then rebuilds the text file
-def "sort combinations" [
-  filename: string # The name of the file to sort items
-  skip_on: string = "-" # The character to skip sorting on, this should be some kind of special character such as "-,_,*"
-] {
-  let lines = open $filename | decode utf-8 | lines
-  mut sorted_stream = []
-
-  for $line in $lines {
-    let will_skip = $line | str starts-with $skip_on
-
-    if $will_skip {
-      $sorted_stream = ($sorted_stream | append $line)
-      continue
+def "empty trash" [] {
+  do {
+      # run pwsh -c 'whoami /user' to find your SID and replace it there
+      rm -rf C:\$Recycle.Bin\S-1-5-21-328912919-4025806940-3881157763-8676\
     }
-
-    # Get Indices of all splits we need to make via substring
-    let has_opts = ternary boolean ($line | str index-of "[" | $in >= 0) true false
-    let prefixIdx = $line | str index-of ")"
-    let reqIdx = ternary boolean ($has_opts) ($line | str index-of "[") ($line | str length)
-    let optIdx = ternary boolean ($has_opts) ($line | str index-of "]") ($line | str length)
-
-    let prefix = $line | str substring 0..($prefixIdx + 1)
-
-    # Split line into rows and trim all whitespice
-    let req = $line | str substring ($prefixIdx + 1)..($reqIdx - 1) | split row ", " | str trim | compact --empty
-    let sorted_req = $req | every 1 | sort | str join ", "
-
-    # Currently breaks if combination doesn't have any optional tags
-    let opt = $line | str substring ($reqIdx + 1)..($optIdx - 1) | split row ", " | str trim
-    let sorted_opt = ternary boolean ($has_opts) ($opt | every 1 | sort | str join ", " | $", [($in)]") ("")
-
-    $sorted_stream = ($sorted_stream | append $"($prefix)($sorted_req)($sorted_opt)" | str trim --char " ")
-  }
-
-  return $sorted_stream
 }
