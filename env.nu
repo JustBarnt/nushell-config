@@ -86,10 +86,11 @@ use std "path add"
 path add ($env.PATH | path join 'D:\CommSys\Tools\DbManager\.bin')
 path add ($env.PATH | path join 'C:\Utilities\SysinternalsSuite\')
 path add ($env.PATH | path join 'C:\Utilities\StrawberryPerl\perl\bin')
-path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/lsp/')
-path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/avalonia-preview/')
-path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/solution-parser/')
-path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/xaml-styler/')
+path add ($env.PATH | path join '~/.local/bin')
+# path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/lsp/')
+# path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/avalonia-preview/')
+# path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/solution-parser/')
+# path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/xaml-styler/')
 
 $env.BAT_CONFIG_PATH = '~/.config/bat/'
 $env.YAZI_CONFIG_HOME = '~/.config/yazi/'
