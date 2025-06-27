@@ -281,7 +281,8 @@ def "count tags" [patterns: list<string>] {
 
 def "empty trash" [] {
   do {
-      # run pwsh -c 'whoami /user' to find your SID and replace it there
-      rm -rf C:\$Recycle.Bin\S-1-5-21-328912919-4025806940-3881157763-8676\
-    }
+    # run pwsh -c 'whoami /user' to find your SID and replace it there
+    rm -rf C:\$Recycle.Bin\S-1-5-21-328912919-4025806940-3881157763-8676\
+  }
 }
+
