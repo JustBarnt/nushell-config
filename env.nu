@@ -114,6 +114,8 @@ $env.TOPIARY_LANGUAGE_DIR = ($env.XDG_CONFIG_HOME | path join topiary languages)
 
 $env._ZO_RESOLVE_SYMLINKS = 1
 
+$env.NEOVIDE_CONFIG = "~/.config/neovide/neovide.toml"
+
 # To load from a custom file you can use:
 # source ()
 
