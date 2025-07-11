@@ -118,7 +118,6 @@ $env.config.hooks = {
 }
 
 source ~/.local/share/zoxide/.zoxide.nu
-source ~/.local/share/atuin/init.nu
 
 # Custom Completion Sources
 source ./completions/scoop-completions.nu
@@ -181,45 +180,48 @@ def edit-vars [] {
   }
 }
 
-# TODO: Sometimes the logs are in a folder inside the case, need to handle this somehow 🙃
-def "peek logs" [path: string] {
-  match ($env.JIRA_ATTACHMENTS_DIR == null) {
+def "logs copy" [path: string] {
+  const JIRA_ATTACHMENTS_DIR = "G:\\Support\\JIRA Attachments\\"
+  match ($env.JIRA_CASE_DIR == null) {
     true => {
       error make {
-        msg: $"Missing environment variables: JIRA_ATTACHMENTS_DIR"
-      }
-    }
-    false => {
-      let case_dir = $path | str upcase
-      $env.JIRA_ATTACHMENTS_DIR | path join $case_dir | ls $in
-    }
-  }
-}
-
-def "copy logs" [path: string, depth: int = 1] {
-  match ($env.JIRA_CASE_DIR == null or $env.JIRA_ATTACHMENTS_DIR == null) {
-    true => {
-      error make {
-        msg: $"Missing one or more of the following environment variables: JIRA_CASE_DIR, JIRA_ATTACHMENTS_DIR"
+        msg: $"Missing: JIRA_CASE_DIR"
       }
     }
     false => {
       if not ($env.JIRA_CASE_DIR | path exists) {
-        print $"(ansi green_bold)JIRA_CASE_DIR not found."
-        print $"Creating directories...(ansi reset)"
+        print $"(ansi green_bold)JIRA_CASE_DIR not found.\nCreating directory...(ansi reset)"
         mkdir $env.JIRA_CASE_DIR
       }
 
       let case_dir = $path | str upcase
+      let copy_from = $JIRA_ATTACHMENTS_DIR | path join $case_dir
 
-      let copy_path = $env.JIRA_ATTACHMENTS_DIR | path join $case_dir
+      try {
+        let item = (ls -m $copy_from | reduce {|item, acc|
+          if ($item.modified) > ($acc.modified) {
+            $item
+          } else {
+            $acc
+          }
+        })
 
-      let log_name = fd -tf Clear.log --max-depth $depth $copy_path | path basename
-      let log_path = $copy_path | path join $log_name
-
-      let output_path = $env.JIRA_CASE_DIR | path join $'($case_dir)Clear.log'
-
-      cp $log_path $output_path
+        match $item.type {
+          "application/zip" => {
+            print $"(ansi blue_bold)Archive Found: ($item.name)"
+            print $"Extracting to: ($env.JIRA_CASE_DIR)/($item.name)"
+            tar -xf ($case_dir | path join $item.name)
+            print $"Archive Extracted!(ansi reset)"
+            return
+          }
+          "text/plain" => {
+            cp $item.name $env.JIRA_CASE_DIR
+            return
+          }
+        }
+      } catch {
+        "No logs found"
+      }
     }
   }
 }

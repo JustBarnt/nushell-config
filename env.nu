@@ -119,12 +119,10 @@ $env.NEOVIDE_CONFIG = "~/.config/neovide/neovide.toml"
 # To load from a custom file you can use:
 # source ()
 
-let atuin_dir =    "~/.local/share/atuin"
 let zoxide_dir =   "~/.local/share/zoxide"
 let starship_dir = "~/.local/share/starship"
 
 
 
-mkdir ~/.local/share/atuin | atuin init nu | save -f ~/.local/share/atuin/init.nu
 mkdir ~/.local/share/zoxide | zoxide init nushell | save -f ~/.local/share/zoxide/.zoxide.nu
 mkdir ~/.local/share/starship | starship init nu | save -f ~/.local/share/starship/init.nu
