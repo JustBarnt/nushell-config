@@ -126,6 +126,7 @@ source ./completions/dotnet-completions.nu
 source ./completions/git-completions.nu
 source ./completions/rg-completions.nu
 source ./completions/zoxide-completions.nu
+source ./completions/completions-jj.nu
 
 # Custom Completion Menus
 source ./menus/zoxide-menu.nu
