@@ -5,7 +5,9 @@ def commands [] {
   }
 }
 
-def synchronize [] {
+def synchronize [
+  name?: string
+] {
   let is_git_dir = (".git" | path exists)
 
   if ($name != null) {
@@ -71,7 +73,7 @@ export def --env main [
         error make { msg: "Unable to find a New-ClipsPatch.ps1 file on the system." }
       }
     },
-    "sync" => synchronize
-    "update" => synchronize
+    "sync" => { synchronize $name }
+    "update" => { synchronize $name }
   }
 }
