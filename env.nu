@@ -111,7 +111,8 @@ $env.JIRA_CASE_DIR = "D:/CommSys/Projects/JIRA/Logs/"
 $env.JIRA_ATTACHMENTS_DIR = "G:/Support/JIRA Attachments/"
 $env.TOPIARY_CONFIG_FILE = ($env.XDG_CONFIG_HOME | path join topiary languages.ncl)
 $env.TOPIARY_LANGUAGE_DIR = ($env.XDG_CONFIG_HOME | path join topiary languages)
-
+$env.JAVA_HOME = "C:/Program Files/Java/jdk-24"
+ 
 $env._ZO_RESOLVE_SYMLINKS = 1
 
 $env.NEOVIDE_CONFIG = "~/.config/neovide/neovide.toml"
