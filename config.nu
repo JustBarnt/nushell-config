@@ -30,7 +30,7 @@ if "TERM_PROGRAM" in $env {
   }
 }
 
-$env.config.show_banner = false
+$env.config.show_banner = 'short'
 $env.config.filesize.unit = "binary"
 $env.config.table = {
   mode: single #reinforced
@@ -43,6 +43,7 @@ $env.config.table = {
     truncating_suffix: "..."
   }
   header_on_separator: false
+  missing_value_symbol: "NULL"
 }
 $env.config.error_style = "fancy"
 $env.config.rm.always_trash = true
@@ -80,7 +81,7 @@ $env.config.shell_integration = {
   osc2: true
   osc7: true
   osc8: true
-  osc9_9: false
+  osc9_9: true
   osc133: true #$is_ocs133_enabled
   osc633: true
   reset_application_mode: true
