@@ -131,12 +131,15 @@ source ./completions/completions-jj.nu
 # Custom Completion Menus
 source ./menus/zoxide-menu.nu
 
+use themes/tokyo-night.nu
+
 # Custom Modules
 use modules/warp
 use modules/db
 use modules/docs
 use modules/msvs
 use modules/expand
+use modules/windows *
 
 # Alias VIM
 alias core-vim = vim
