@@ -94,7 +94,7 @@ path add ($env.PATH | path join $'($env."ProgramFiles(x86)")\Microsoft Visual St
 # path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/xaml-styler/')
 
 if (sys host | $in.name == "Windows") {
-    $env.HOME = $env.HOMEPATH
+    $env.HOME = ([$env.HOMEDRIVE $env.HOMEPATH]) | path join
 }
 
 $env.BAT_CONFIG_PATH = '~/.config/bat/'
