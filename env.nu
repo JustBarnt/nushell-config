@@ -93,6 +93,10 @@ path add ($env.PATH | path join $'($env."ProgramFiles(x86)")\Microsoft Visual St
 # path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/solution-parser/')
 # path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/xaml-styler/')
 
+if (sys host | $in.name == "Windows") {
+    $env.HOME = $env.HOMEPATH
+}
+
 $env.BAT_CONFIG_PATH = '~/.config/bat/'
 $env.YAZI_CONFIG_HOME = '~/.config/yazi/'
 $env.TELEVISION_CONFIG = 'C:\Users\bwilliams\.config\television\'
