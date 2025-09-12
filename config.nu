@@ -30,7 +30,7 @@ if "TERM_PROGRAM" in $env {
   }
 }
 
-$env.config.show_banner = 'short'
+$env.config.show_banner = false
 $env.config.filesize.unit = "binary"
 $env.config.table = {
   mode: single #reinforced
