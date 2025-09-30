@@ -52,10 +52,7 @@ $env.config.ls = {
   clickable_links: true
 }
 $env.config.history = {
-  max_size: 5_000_000
-  sync_on_enter: true
-  file_format: "sqlite"
-  isolation: true
+  file_format: "plaintext"
 }
 $env.config.completions = {
   case_sensitive: false
