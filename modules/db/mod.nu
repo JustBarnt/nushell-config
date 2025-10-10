@@ -17,19 +17,26 @@ def synchronize [
   }
 
   if $is_git_dir {
-    print $"(ansi bu)Export finished - Stashing any changes and updating working copy...(ansi reset)"
-    # stash content
-    git stash
+    print $"(ansi bu)Export finished - Checking to for upstream changes...(ansi reset)"
+
     # fetch content
     let fetch_attempt = git fetch origin dev | complete
     if $fetch_attempt.exit_code != 0 {
       git fetch origin dev
     }
+
+    let is_behind = git status | complete | get stdout | str contains -i "your branch is behind"
+    if $is_behind {
+      # stash content
+      print $"(ansi bu)Upstream changes found; Stashing local changes...(ansi reset)"
+      git stash
+    }
+
     # rebase content
     git rebase
 
-    # apply stash if `git stash list` has a stdout value
-    if (git stash list | complete | $in.stdout != "") {
+    # pop stash if local was behind after rebase
+    if $is_behind {
       print $"(ansi bu)Applying stashed changes...(ansi reset)"
       git stash pop
     }
@@ -45,35 +52,41 @@ def synchronize [
   }
 }
 
+# Creates a CLIPS Dbd Patch. You need `New-ClipsPatch.ps1` in your $PATH
+# for this to work
+def patch [] {
+  try {
+    pwsh -c New-ClipsPatch.ps1
+  }
+  catch {
+    "Could not fine 'New-ClipsPatch.ps1' please make sure it exists and 
+    is in a folder defined in `$PATH`"
+  }
+}
+
 # Synchronize CommSys or CLIPS databases
 #
 # Use to synchronize your databases OR create a CLIPS DBD Patch
 #
-# SYNC:  Synchronize a database
-# PATCH: Build a database patch using `New-ClipsPatch.ps1`
-#        can be found on confluence
+# UPDATE: Updates and synchronizes the database
+# PATCH:  Build a database patch using `New-ClipsPatch.ps1`
+#         can be found on confluence
 export def --env main [
   command: string@commands, # Database command to run
   name?: string # Name of Database (Only needed for clips databases)
 ] {
+  let span = (metadata $command).span;
   match $command {
-    "patch" => {
-      if (which fd | length | $in == 0) {
-        print $"(ansi red_bold)`fd`(ansi reset) was not found on the system, please install fd with (ansi blue_underlined)`scoop install fd` first.(ansi reset)"
-        return
-      }
-
-      let match: list<string> = sys disks | get mount | par-each {|disk|
-        let stdout: string = fd -tf New-ClipsPatch.ps1 | complete | get stdout | path expand
-        return $stdout
-      }
-      if ($match != "") {
-        pwsh -c $"($match)"
-      } else {
-        error make { msg: "Unable to find a New-ClipsPatch.ps1 file on the system." }
-      }
-    },
-    "sync" => { synchronize $name }
+    "patch" => { patch }, 
+    "sync" => { 
+      error make {
+        msg: $"(ansi ri)db sync(ansi rst) is deprecated. See (ansi lgb)db -h(ansi rst)",
+        label: { 
+          text: $"(ansi ri)sync(ansi rst) is deprecated",
+          span: $span 
+        } 
+      } 
+    }
     "update" => { synchronize $name }
   }
 }
