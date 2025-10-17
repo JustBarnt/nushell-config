@@ -40,7 +40,7 @@ def synchronize [
     # pop stash if local was behind after rebase
     if $has_changes {
       print $"(ansi bu)Rebase successul... Applying stashed changes...(ansi reset)"
-      git stash pop
+      do -i { git stash pop } 
     }
   } else {
     print $"(ansi bu)Export finished - updating working copy...(ansi reset)"
