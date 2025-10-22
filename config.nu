@@ -283,6 +283,12 @@ def "count tags" [patterns: list<string>] {
   }
 }
 
+def "restart into bios" [] {
+  sudo;
+  print "Windows will shutdown in 10 seconds and boot into bios..."
+  C:\Windows\System32\shutdown.exe /r /fw /t 10
+}
+
 def "empty trash" [] {
   do {
     # run pwsh -c 'whoami /user' to find your SID and replace it there
