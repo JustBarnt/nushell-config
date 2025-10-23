@@ -283,6 +283,12 @@ def "count tags" [patterns: list<string>] {
   }
 }
 
+def "date julian" [] {
+  let julian = date now | format date "%y%j"
+  $julian | clip
+  $julian
+}
+
 def "restart into bios" [] {
   sudo;
   print "Windows will shutdown in 10 seconds and boot into bios..."
