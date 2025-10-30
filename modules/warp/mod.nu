@@ -11,7 +11,7 @@ export def --env main [prefix: string@locations] {
     "builds" => { cd D:/CommSys/Projects/Builds/ }
     "ccic" => { cd D:/CommSys/ConnectCIC/ConnectCIC/ }
     "ccicdb" => { cd D:/CommSys/ConnectCIC/database/ }
-    "clips" => { cd D:/CommSys/CLIPS/CLIPS/Application/ }
+    "clips" => { cd D:/CommSys/CLIPS/CLIPS/ }
     "clipsdb" => { cd D:/CommSys/CLIPS/Database-1/ }
     "docs" => { cd D:/CommSys/ConnectCIC_SVN/ConnectCicDevDocs/ }
     "jira" => { cd D:/CommSys/Projects/JIRA/ }
