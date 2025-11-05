@@ -25,23 +25,17 @@ def synchronize [
       git fetch origin dev
     }
 
-    let is_behind = git status | complete | get stdout | str contains -i "your branch is behind"
-    let has_changes = git status --short | complete | get stdout | $in != ""
-    if $is_behind and $has_changes {
-      # stash content
-      print $"(ansi bu)Upstream changes found; Stashing local changes...(ansi reset)"
-      git stash
-    }
+
+    print $"(ansi bu)Stashing Content...(ansi reset)"
+    do -i { git stash }
 
     # rebase content
     print $"(ansi bu)Rebasing now...(ansi reset)"
-    git rebase
+    do -i { git rebase }
 
     # pop stash if local was behind after rebase
-    if $has_changes {
-      print $"(ansi bu)Rebase successul... Applying stashed changes...(ansi reset)"
-      do -i { git stash pop } 
-    }
+    print $"(ansi bu)Rebase successul... Applying stashed changes...(ansi reset)"
+    do -i { git stash pop } 
   } else {
     print $"(ansi bu)Export finished - updating working copy...(ansi reset)"
     svn update
