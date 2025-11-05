@@ -46,6 +46,12 @@ def synchronize [
   } else { 
     dbmanager import-content
   }
+
+  if (($name | str contains -i "clips")) {
+    print $"(ansi bu)Syncing Changes between Clips 1 and Clips 2 database(ansi reset)"
+    cd ../database-2/
+    .\dbsync CLIPS1 CLIPS2 localhost
+  }
 }
 
 # Creates a CLIPS Dbd Patch. You need `New-ClipsPatch.ps1` in your $PATH
