@@ -228,26 +228,23 @@ def "logs copy" [path: string] {
   }
 }
 
-def "start clips" [path?: string = "CLIPS"] {
-  # TODO:CHECK IF PATH IS VALID
-  let clips_dir = $'D:\CommSys\CLIPS'
-  let span = (metadata $path).span
-  let test_path: string = $'($clips_dir)\($path)\Application'
-  match ($test_path | path exists) {
-    true => {
-      cd $'($clips_dir)\($path)\Application'
-      ./console/cake.bat server -H 127.0.0.1 -p 80
-    }
-    false => {
-      error make {
-        msg: "Path does not exists"
-        label: {
-          text: $"Could not change directories to: \n($clips_dir)($path)\\Application"
-          span: $span
-        }
-      }
-    }
+# TODO: Add completion to this for the Branches available
+# TODO: Also add form tools for this as well as a flag
+
+
+def "start clips" [
+  --branch (-b)
+  --path (-p): string
+] {
+  mut CLIPS = 'D:\CommSys\CLIPS\CLIPS\'
+
+  if $branch {
+    $CLIPS = ($CLIPS | path join $'Branches\($path)\Application')
+    cd $CLIPS
+  } else { 
+    cd ($CLIPS | path join `Trunk\Application`)
   }
+  ./console/cake.bat server -H 127.0.0.1 -p 80
 }
 
 def "start formtools" [] {
