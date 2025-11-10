@@ -132,6 +132,7 @@ source ./menus/zoxide-menu.nu
 use themes/tokyo-night.nu
 
 # Custom Modules
+use modules/clips
 use modules/warp
 use modules/db
 use modules/docs
@@ -228,30 +229,6 @@ def "logs copy" [path: string] {
   }
 }
 
-# TODO: Add completion to this for the Branches available
-# TODO: Also add form tools for this as well as a flag
-
-
-def "start clips" [
-  --branch (-b)
-  --path (-p): string
-] {
-  mut CLIPS = 'D:\CommSys\CLIPS\CLIPS\'
-
-  if $branch {
-    $CLIPS = ($CLIPS | path join $'Branches\($path)\Application')
-    cd $CLIPS
-  } else { 
-    cd ($CLIPS | path join `Trunk\Application`)
-  }
-  ./console/cake.bat server -H 127.0.0.1 -p 80
-}
-
-def "start formtools" [] {
-  cd `D:\CommSys\CLIPS\FormTools\ClipsWebTools\`
-  php -S 127.0.0.1:8080 -t .
-}
-
 def glog [count: int] {
   git log --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD -n $count | lines | split column "»¦«" commit subject name email date
 }
@@ -298,6 +275,3 @@ def "empty trash" [] {
     rm -rf C:\$Recycle.Bin\S-1-5-21-328912919-4025806940-3881157763-8676\
   }
 }
-
-
-
