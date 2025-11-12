@@ -138,7 +138,7 @@ use modules/db
 use modules/docs
 use modules/msvs
 use modules/expand
-use modules/windows *
+use modules/windows
 
 # Alias VIM
 alias core-vim = vim
