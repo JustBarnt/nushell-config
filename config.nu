@@ -29,7 +29,8 @@ if "TERM_PROGRAM" in $env {
     use ~/.cache/starship/init.nu
   }
 }
-
+use themes\onedark.nu
+$env.config.color_config = (onedark)
 $env.config.show_banner = false
 $env.config.filesize.unit = "binary"
 $env.config.table = {
@@ -118,18 +119,19 @@ $env.config.hooks = {
 source ~/.local/share/zoxide/.zoxide.nu
 
 # Custom Completion Sources
-source ./completions/scoop-completions.nu
 source ./completions/cargo-completions.nu
+source ./completions/completions-jj.nu
 source ./completions/dotnet-completions.nu
 source ./completions/git-completions.nu
 source ./completions/rg-completions.nu
+source ./completions/scoop-completions.nu
+source ./completions/uv-completions.nu
+source ./completions/winget-completions.nu
 source ./completions/zoxide-completions.nu
-source ./completions/completions-jj.nu
 
 # Custom Completion Menus
 source ./menus/zoxide-menu.nu
 
-use themes/tokyo-night.nu
 
 # Custom Modules
 use modules/clips
