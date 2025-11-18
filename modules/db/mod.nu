@@ -1,77 +1,84 @@
-def commands [] {
-  {
-    options: { case_sensitive: false, completion_algorithm: prefix, positional: true, sort: true },
-    completions: ["update", "patch"]
+# Updates and synchronizes the databases
+#
+# Input:
+#   None
+export def "update" [] {
+  let $repo = get_repo_url get_vcs
+  let $is_clips = is_clips_repo $repo
+
+  if $is_clips {
+    dbmanager export-content --database="Clips1"
+  } else {
+    dbmanager export-content
+  }
+
+  try {
+    write "Export finished - Checking to for upstream changes..."
+
+    # Saftey net in case it has been more than 24 hours since last gitea request
+    if (git fetch origin dev | complete).exit_code != 0 {
+      git fetch origin dev
+    }
+
+    write "Stashing and pulling latest changes..."
+    git pull --rebase --autostash origin dev
+    write "Successfully updated from remote"
+  } catch {|err|
+    write "Failed to sync" -c red_bold -e err
+  }
+
+  if ($is_clips) {
+    dbmanager import-content --database="Clips1"
+  } else {
+    dbmanager import-content
+  }
+
+  if ($is_clips) {
+    write "Syncing Changes between Clips 1 and Clips 2 database"
+    cd ../database-2/
+    .\dbsync CLIPS1 CLIPS2 localhost
   }
 }
 
-def synchronize [] {
-    let $repo =  [(git remote get-url origin | str trim) (git rev-parse --abbrev-ref HEAD | str trim)] | str join "/"
-    mut $is_clips = $repo == "https://svnstore:3000/clips/database/dev"
-
-    if $is_clips {
-        dbmanager export-content --database="Clips1"
-    } else {
-        dbmanager export-content
-    }
-
-    print $"(ansi bu)Export finished - Checking to for upstream changes...(ansi reset)"
-
-    # fetch content
-    let fetch_attempt = git fetch origin dev | complete
-    if $fetch_attempt.exit_code != 0 {
-        git fetch origin dev
-    }
-
-    print $"(ansi bu)Stashing Content...(ansi reset)"
-    do -i { git stash }
-
-    # rebase content
-    print $"(ansi bu)Rebasing now...(ansi reset)"
-    do -i { git rebase }
-
-    # pop stash if local was behind after rebase
-    print $"(ansi bu)Rebase successul... Applying stashed changes...(ansi reset)"
-    do -i { git stash pop }
-
-    if ($is_clips) {
-        dbmanager import-content --database="Clips1"
-    } else {
-        dbmanager import-content
-    }
-
-    if ($is_clips) {
-        print $"(ansi bu)Syncing Changes between Clips 1 and Clips 2 database(ansi reset)"
-        cd ../database-2/
-        .\dbsync CLIPS1 CLIPS2 localhost
-    }
+# Creates a CLIPS Dbd Patch. You need `New-ClipsPatch.ps1` in your $PATH
+#
+# Input:
+#   None
+export def "patch" [] {
+  try {
+    pwsh -c New-ClipsPatch.ps1
+  } catch {
+    "Could not fine 'New-ClipsPatch.ps1' please make sure it exists and
+        is in a folder defined in `$PATH`"
+  }
 }
 
-    # Creates a CLIPS Dbd Patch. You need `New-ClipsPatch.ps1` in your $PATH
-    # for this to work
-    def patch [] {
-        try {
-            pwsh -c New-ClipsPatch.ps1
-        }
-        catch {
-            "Could not fine 'New-ClipsPatch.ps1' please make sure it exists and
-            is in a folder defined in `$PATH`"
-        }
-    }
+# This module provides an easy interface to update and synchronize your databases
+#
+# Commands:
+#   Patch  - Creates a CLIPS Patch
+#   Update - Updates and Synchronizes the database using your current directory as
+#            an indicator for which database
+export def main []: nothing -> string {
+  help db
+}
 
-    # Synchronize CommSys or CLIPS databases
-    #
-    # Use to synchronize your databases OR create a CLIPS DBD Patch
-    #
-    # UPDATE: Updates and synchronizes the database
-    # PATCH:  Build a database patch using `New-ClipsPatch.ps1`
-    #         can be found on confluence
-    export def --env main [
-        command: string@commands, # Database command to run
-        name?: string # Name of Database (Only needed for clips databases)
-    ] {
-        match $command {
-            "patch" => { patch },
-            "update" => { synchronize }
-            }
-    }
+def get_vcs []: nothing -> string {
+  match (".git" | path exists) {
+    true => "git"
+    false => "svn"
+  }
+}
+
+def get_repo_url [vcs: string]: nothing -> string {
+  if $vcs == "git" {
+    [(git remote get-url origin) (git rev-parse --abbrev-ref HEAD)] | str join "/" | str trim
+  } else {
+    svn info --show-item url | str trim
+  }
+}
+
+def is_clips_repo [url: string]: nothing -> bool {
+  ["https://svnstore:3000/clips/database/dev" "https://svnstore:8443/svn/CommSys/Clips/Database/Branches/dev"]
+  | any {|| ($in | str downcase) == $url }
+}

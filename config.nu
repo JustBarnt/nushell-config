@@ -277,3 +277,32 @@ def "empty trash" [] {
     rm -rf C:\$Recycle.Bin\S-1-5-21-328912919-4025806940-3881157763-8676\
   }
 }
+
+def color-completer [] {
+  ansi --list
+  | get name
+}
+
+def write [
+  message: string
+  --color (-c): string@color-completer = "blue_bold"
+  --error (-e): any
+  --prefix (-p): string = "[INFO]"
+]: nothing -> nothing {
+  mut $output = $message
+
+  if ($prefix != null) {
+    $output = $"($prefix) ($output)"
+  }
+
+  if ($error != null) {
+    let $err_msg = match ($error | describe) {
+      "string" => $error
+      "record" => (if "msg" in $error { $error.msg } else { $error | to json })
+      _ => ($error | to text)
+    }
+    $output = $"($output): ($err_msg)"
+  }
+
+  print $"(ansi $color)($output)(ansi reset)"
+}
