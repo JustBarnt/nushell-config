@@ -17,18 +17,6 @@
 # You can remove these comments if you want or leave
 # them for future reference.
 
-mut is_ocs133_enabled = true
-
-if "TERM_PROGRAM" in $env {
-  # Disable ocs133 in WEZTERM. Everytime you type a character it inserts a new
-  # line into the terminal
-  $is_ocs133_enabled = false
-
-  # If we are in Rider, don't use starship
-  if $env.TERM_PROGRAM != "Rider" {
-    use ~/.cache/starship/init.nu
-  }
-}
 use themes\onedark.nu
 $env.config.color_config = (onedark)
 $env.config.show_banner = false
@@ -80,7 +68,7 @@ $env.config.shell_integration = {
   osc7: true
   osc8: true
   osc9_9: true
-  osc133: true #$is_ocs133_enabled
+  osc133: true
   osc633: true
   reset_application_mode: true
 }
@@ -107,7 +95,7 @@ $env.config.plugin_gc = {
   }
 }
 $env.config.hooks = {
-  pre_prompt: [{ null }] # run before the prompt is shown
+  # pre_prompt: [{ null }] # run before the prompt is shown
   pre_execution: [{ null }] # run before the repl input is run
   env_change: {
     PWD: [{|before, after| null }] # run if the PWD environment is different since the last repl input
@@ -117,6 +105,7 @@ $env.config.hooks = {
 }
 
 source ~/.local/share/zoxide/.zoxide.nu
+use ~/.cache/starship/init.nu
 
 # Custom Completion Sources
 source ./completions/cargo-completions.nu
@@ -136,6 +125,7 @@ source ./menus/zoxide-menu.nu
 
 # Custom Modules
 use modules/log
+use modules/utils [from-rgb to-rgb]
 use modules/clips
 use modules/db
 use modules/docs
@@ -161,20 +151,6 @@ def --env y [...args] {
 def usevim [name: string, args] {
   $env.NVIM_APPNAME = $name
   nvim $args
-}
-
-def nu-treesitter-highlights [] {
-  let remote = "https://raw.githubusercontent.com/nushell/tree-sitter-nu/main/queries/nu/"
-  let local = (
-    $env.XDG_DATA_HOME?
-    | default ($env.LOCALAPPDATA | path join "nvim-data")
-    | path join "nvim" "lazy" "nvim-treesitter" "queries" "nu"
-  )
-
-  let file = "highlights.scm"
-
-  mkdir $local
-  http get ([$remote $file] | str join "/") | save --force ($local | path join $file)
 }
 
 def edit-vars [] {
@@ -270,7 +246,7 @@ def "date julian" [] {
 
 def "restart into bios" [] {
   sudo;
-  write "Windows will shutdown in 10 seconds and boot into bios..." -c yellow_bold --prefix "[WARN]"
+  log "Windows will shutdown in 10 seconds and boot into bios..." --color yellow_bold --prefix "[WARN]"
   C:\Windows\System32\shutdown.exe /r /fw /t 10
 }
 
