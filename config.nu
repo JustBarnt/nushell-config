@@ -137,10 +137,10 @@ source ./completions/rg-completions.nu
 source ./completions/scoop-completions.nu
 source ./completions/uv-completions.nu
 source ./completions/winget-completions.nu
-source ./completions/zoxide-completions.nu
+# source ./completions/zoxide-completions.nu
 
 # Custom Completion Menus
-source ./menus/zoxide-menu.nu
+# source ./menus/zoxide-menu.nu
 
 
 # Custom Modules
