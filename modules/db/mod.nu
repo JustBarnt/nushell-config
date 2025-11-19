@@ -13,30 +13,41 @@ export def "update" [] {
   }
 
   try {
-    write "Export finished - Checking to for upstream changes..."
+    log  "Export finished - Checking to for upstream changes..."
 
     # Saftey net in case it has been more than 24 hours since last gitea request
     if (git fetch origin dev | complete).exit_code != 0 {
       git fetch origin dev
     }
 
-    write "Stashing and pulling latest changes..."
+    log  "Stashing and pulling latest changes..."
     git pull --rebase --autostash origin dev
-    write "Successfully updated from remote"
+    log "Successfully updated from remote"
   } catch {|err|
-    write "Failed to sync" -c red_bold -e err
+    log "Failed to sync" -e $err
   }
 
   if ($is_clips) {
-    dbmanager import-content --database="Clips1"
+    dbmanager import-content --database="Clips1" | complete
+    | if $in.stderr != "" {
+        log "" -e $in.stderr
+        return
+      } else {
+        log $in.stdout
+      }
+
+
+    log "Syncing Changes between Clips 1 and Clips 2 database"
+    cd ../database-2/
+    .\dbsync CLIPS1 CLIPS2 localhost | complete
+    | if $in.stderr != "" {
+        log "" -e $in.stderr
+        return
+      } else {
+        log $in.stdout
+      }
   } else {
     dbmanager import-content
-  }
-
-  if ($is_clips) {
-    write "Syncing Changes between Clips 1 and Clips 2 database"
-    cd ../database-2/
-    .\dbsync CLIPS1 CLIPS2 localhost
   }
 }
 
@@ -47,9 +58,8 @@ export def "update" [] {
 export def "patch" [] {
   try {
     pwsh -c New-ClipsPatch.ps1
-  } catch {
-    "Could not fine 'New-ClipsPatch.ps1' please make sure it exists and
-        is in a folder defined in `$PATH`"
+  } catch {|err|
+    log "Could not fine 'New-ClipsPatch.ps1' please make sure it exists and is in a folder defined in `$PATH`" --error $err
   }
 }
 

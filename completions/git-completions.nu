@@ -126,7 +126,7 @@ module git-completion-utils {
   export def get-mergable-sources []: nothing -> list<record<value: string, description: string>> {
     let current = (^git branch --show-current)  # Can be empty if in detached HEAD
     (get-all-git-branches | extract-mergable-sources $current)
-  }  
+  }
 }
 
 def "nu-complete git available upstream" [] {

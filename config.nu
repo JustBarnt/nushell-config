@@ -122,6 +122,7 @@ source ~/.local/share/zoxide/.zoxide.nu
 source ./completions/cargo-completions.nu
 source ./completions/completions-jj.nu
 source ./completions/dotnet-completions.nu
+source ./completions/tree-sitter-completions.nu
 source ./completions/git-completions.nu
 source ./completions/rg-completions.nu
 source ./completions/scoop-completions.nu
@@ -135,12 +136,12 @@ source ./menus/zoxide-menu.nu
 
 # Custom Modules
 use modules/clips
-use modules/warp
 use modules/db
 use modules/docs
 use modules/msvs
 use modules/expand
 use modules/windows
+use modules/log
 
 # Alias VIM
 alias core-vim = vim
@@ -185,6 +186,7 @@ def edit-vars [] {
   }
 }
 
+# TODO: Move to module
 def "logs copy" [path: string] {
   const JIRA_ATTACHMENTS_DIR = "G:\\Support\\JIRA Attachments\\"
   match ($env.JIRA_CASE_DIR == null) {
@@ -251,6 +253,7 @@ def --env refreshenv [] {
   $env.path = $out
 }
 
+# TODO: Move to module, also default path here so it can be called from anywhere
 def "count tags" [patterns: list<string>] {
   for pat in $patterns {
     let count = rg -o $pat | wc -l
@@ -267,7 +270,7 @@ def "date julian" [] {
 
 def "restart into bios" [] {
   sudo;
-  print "Windows will shutdown in 10 seconds and boot into bios..."
+  write "Windows will shutdown in 10 seconds and boot into bios..." -c yellow_bold --prefix "[WARN]"
   C:\Windows\System32\shutdown.exe /r /fw /t 10
 }
 
@@ -276,33 +279,4 @@ def "empty trash" [] {
     # run pwsh -c 'whoami /user' to find your SID and replace it there
     rm -rf C:\$Recycle.Bin\S-1-5-21-328912919-4025806940-3881157763-8676\
   }
-}
-
-def color-completer [] {
-  ansi --list
-  | get name
-}
-
-def write [
-  message: string
-  --color (-c): string@color-completer = "blue_bold"
-  --error (-e): any
-  --prefix (-p): string = "[INFO]"
-]: nothing -> nothing {
-  mut $output = $message
-
-  if ($prefix != null) {
-    $output = $"($prefix) ($output)"
-  }
-
-  if ($error != null) {
-    let $err_msg = match ($error | describe) {
-      "string" => $error
-      "record" => (if "msg" in $error { $error.msg } else { $error | to json })
-      _ => ($error | to text)
-    }
-    $output = $"($output): ($err_msg)"
-  }
-
-  print $"(ansi $color)($output)(ansi reset)"
 }
