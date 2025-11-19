@@ -135,13 +135,13 @@ source ./menus/zoxide-menu.nu
 
 
 # Custom Modules
+use modules/log
 use modules/clips
 use modules/db
 use modules/docs
 use modules/msvs
 use modules/expand
 use modules/windows
-use modules/log
 
 # Alias VIM
 alias core-vim = vim

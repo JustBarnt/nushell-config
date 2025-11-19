@@ -97,6 +97,7 @@ if (sys host | $in.name == "Windows") {
     $env.HOME = ([$env.HOMEDRIVE $env.HOMEPATH]) | path join
 }
 
+# TODO: All of these if I am on windows need to get added via dos command to my path instead of being set on if I am in terminal
 $env.BAT_CONFIG_PATH = '~/.config/bat/'
 $env.YAZI_CONFIG_HOME = '~/.config/yazi/'
 $env.TELEVISION_CONFIG = 'C:\Users\bwilliams\.config\television\'
@@ -117,7 +118,7 @@ $env.JIRA_ATTACHMENTS_DIR = "G:/Support/JIRA Attachments/"
 $env.TOPIARY_CONFIG_FILE = ($env.XDG_CONFIG_HOME | path join topiary languages.ncl)
 $env.TOPIARY_LANGUAGE_DIR = ($env.XDG_CONFIG_HOME | path join topiary languages)
 $env.JAVA_HOME = "C:/Program Files/Java/jdk-24"
- 
+
 $env._ZO_RESOLVE_SYMLINKS = 1
 
 $env.NEOVIDE_CONFIG = "~/.config/neovide/neovide.toml"
