@@ -94,6 +94,7 @@ $env.config.plugin_gc = {
     }
   }
 }
+
 $env.config.hooks = {
   # pre_prompt: [{ null }] # run before the prompt is shown
   pre_execution: [{ null }] # run before the repl input is run
@@ -108,6 +109,7 @@ source ~/.local/share/zoxide/.zoxide.nu
 use ~/.cache/starship/init.nu
 
 # Custom Completion Sources
+source ./completions/dbmanager-completions.nu
 source ./completions/cargo-completions.nu
 source ./completions/completions-jj.nu
 source ./completions/dotnet-completions.nu
@@ -244,11 +246,11 @@ def "date julian" [] {
   $julian
 }
 
-def "restart into bios" [] {
-  sudo;
-  log "Windows will shutdown in 10 seconds and boot into bios..." --color yellow_bold --prefix "[WARN]"
-  C:\Windows\System32\shutdown.exe /r /fw /t 10
-}
+# def "restart into bios" [] {
+#   sudo;
+#   log "Windows will shutdown in 10 seconds and boot into bios..." --color yellow_bold --prefix "[WARN]"
+#   C:\Windows\System32\shutdown.exe /r /fw /t 10
+# }
 
 def "empty trash" [] {
   do {
