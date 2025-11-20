@@ -17,6 +17,24 @@
 # You can remove these comments if you want or leave
 # them for future reference.
 
+# TODO: Setup proper use of $nu.data-dir
+# NU_LIB_DIRS
+# -----------
+# Directories in this constant are searched by the
+# `use` and `source` commands.
+#
+# By default, the `scripts` subdirectory of the default configuration
+# directory is included:
+# const NU_LIB_DIRS = [
+#     ($nu.default-config-dir | path join 'scripts') # add <nushell-config-dir>/scripts
+#     ($nu.data-dir | path join 'completions') # default home for nushell completions
+# ]
+# # You can replace (override) or append to this list by shadowing the constant
+# const NU_LIB_DIRS = $NU_LIB_DIRS ++ [($nu.default-config-dir | path join 'modules')]
+
+# # An environment variable version of this also exists. It is searched after the constant.
+# $env.NU_LIB_DIRS ++= [ ($nu.data-dir | path join "nu_scripts") ]
+
 use themes\onedark.nu
 $env.config.color_config = (onedark)
 $env.config.show_banner = false
