@@ -35,7 +35,7 @@
 # # An environment variable version of this also exists. It is searched after the constant.
 # $env.NU_LIB_DIRS ++= [ ($nu.data-dir | path join "nu_scripts") ]
 
-use themes\onedark.nu
+use themes/onedark.nu
 $env.config.color_config = (onedark)
 $env.config.show_banner = false
 $env.config.filesize.unit = "binary"
@@ -123,9 +123,6 @@ $env.config.hooks = {
   command_not_found: { null } # return an error message when a command is not found
 }
 
-source ~/.local/share/zoxide/.zoxide.nu
-use ~/.cache/starship/init.nu
-
 # Custom Completion Sources
 source ./completions/dbmanager-completions.nu
 source ./completions/cargo-completions.nu
@@ -137,10 +134,8 @@ source ./completions/rg-completions.nu
 source ./completions/scoop-completions.nu
 source ./completions/uv-completions.nu
 source ./completions/winget-completions.nu
-# source ./completions/zoxide-completions.nu
 
 # Custom Completion Menus
-# source ./menus/zoxide-menu.nu
 
 
 # Custom Modules

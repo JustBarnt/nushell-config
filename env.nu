@@ -83,18 +83,17 @@ $env.NU_PLUGIN_DIRS = [
 # which is built into the nushell stdlib:
 use std "path add"
 
-path add ($env.PATH | path join 'D:\CommSys\Tools\DbManager\.bin')
-path add ($env.PATH | path join 'C:\Utilities\SysinternalsSuite\')
-path add ($env.PATH | path join 'C:\Utilities\StrawberryPerl\perl\bin')
 path add ($env.PATH | path join '~/.local/bin')
-path add ($env.PATH | path join $'($env."ProgramFiles(x86)")\Microsoft Visual Studio\Installer\')
-# path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/lsp/')
-# path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/avalonia-preview/')
-# path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/solution-parser/')
-# path add ($env.PATH | path join 'D:/Personal/Github/avalonia-ls/bin/xaml-styler/')
+
+if (sys host | get hostname | $in == "CommSys-PC58") {
+  path add ($env.PATH | path join 'D:\CommSys\Tools\DbManager\.bin')
+  path add ($env.PATH | path join 'C:\Utilities\SysinternalsSuite\')
+  path add ($env.PATH | path join 'C:\Utilities\StrawberryPerl\perl\bin')
+}
 
 if (sys host | $in.name == "Windows") {
-    $env.HOME = ([$env.HOMEDRIVE $env.HOMEPATH]) | path join
+  $env.HOME = ([$env.HOMEDRIVE $env.HOMEPATH]) | path join
+  path add ($env.PATH | path join $'($env."ProgramFiles(x86)")\Microsoft Visual Studio\Installer\')
 }
 
 # TODO: All of these if I am on windows need to get added via dos command to my path instead of being set on if I am in terminal
@@ -126,10 +125,6 @@ $env.NEOVIDE_CONFIG = "~/.config/neovide/neovide.toml"
 # To load from a custom file you can use:
 # source ()
 
-# let zoxide_dir =   "~/.local/share/zoxide"
 let starship_dir = "~/.local/share/starship"
 
-
-
-# mkdir ~/.local/share/zoxide | zoxide init nushell | save -f ~/.local/share/zoxide/.zoxide.nu
 mkdir ~/.local/share/starship | starship init nu | save -f ~/.local/share/starship/init.nu
