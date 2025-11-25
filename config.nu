@@ -123,6 +123,8 @@ $env.config.hooks = {
   command_not_found: { null } # return an error message when a command is not found
 }
 
+use ~/.cache/starship/init.nu
+
 # Custom Completion Sources
 source ./completions/dbmanager-completions.nu
 source ./completions/cargo-completions.nu
