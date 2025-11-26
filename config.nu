@@ -124,8 +124,6 @@ $env.config.hooks = {
   command_not_found: { null } # return an error message when a command is not found
 }
 
-use ~/.cache/starship/init.nu
-
 # Custom Completion Sources
 source ./completions/dbmanager-completions.nu
 source ./completions/cargo-completions.nu
@@ -138,9 +136,6 @@ source ./completions/scoop-completions.nu
 source ./completions/uv-completions.nu
 source ./completions/winget-completions.nu
 
-# Custom Completion Menus
-
-
 # Custom Modules
 use modules/log
 use modules/utils [from-rgb to-rgb]
@@ -151,6 +146,14 @@ use modules/msvs
 use modules/expand
 use modules/windows
 use modules/jira *
+
+try {
+  mkdir ($nu.data-dir | path join "vendor/autoload")
+  starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu") 
+} catch {|err|
+  log "" -e $err
+}
+
 
 # Alias VIM
 alias core-vim = vim
@@ -274,14 +277,4 @@ def "empty trash" [] {
     # run pwsh -c 'whoami /user' to find your SID and replace it there
     rm -rf C:\$Recycle.Bin\S-1-5-21-328912919-4025806940-3881157763-8676\
   }
-}
-
-def "str collapse" []: string -> string {
-  $in
-  | split chars
-  | enumerate
-  | group-by {|x| $x.index // 20}
-  | values
-  | each {|chunk| $chunk | get item | str join}
-  | str join "\n"
 }
