@@ -1,6 +1,40 @@
 # JIRA Rest API v3 Module for Nushell
 # Provides commands for querying JIRA issues by key or JQL
 
+def products [] {
+  [
+    {value: '"CLIPS"' description: 'Generate a list of CLIPS changes'}
+    {value: '"State Interfaces"' description: 'Generate a list of State Interfaces changes'}
+    {value: '"ConnectCIC"' description: 'Generate a list of ConnectCIC changes'}
+  ]
+}
+
+const issue_fields = [
+  fixVersions
+  resolution
+  versions
+  status
+  components
+  created
+  description
+  summary
+  customfield_10204 #Interface Field
+  customfield_10600 #Product
+  customfield_10601 #Product Version
+] | str join ","
+
+const search_fields = [
+  key
+  created
+  fixVersions
+  versions
+  components
+  status
+  customfield_10204 #Interface Field
+  customfield_10600 #Product
+  customfield_10601 #Product Version
+] | str join ","
+
 export-env {
   $env.JIRA_BASE_URL = ($env.JIRA_BASE_URL? | default "")
   $env.JIRA_USER = ($env.JIRA_USER? | default "")
@@ -51,15 +85,17 @@ def make-auth-header [] {
 # Output:
 #   table
 def jira-construct-table []: any -> table {
-  $in | each {|issues|
+  $in | par-each {|issues|
     {
-      key: $issues.key
-      assignee: ($issues.fields.assignee?.displayName? | default "Unassigned")
-      created: ($issues.fields.created | into datetime | format date "%Y-%m-%d %H:%M" )
-      fixVersions: ($issues.fields.fixVersions.0?.name? | default "None")
-      affectedVersions: ($issues.fields.versions.0?.name? | default "None")
-      components: ($issues.fields.components.0?.name? | default "None")
-      status: $issues.fields.status.name
+      "Key": $issues.key
+      "Created": ($issues.fields?.created? | default "1970-01-01T00:00:00Z" | into datetime | format date "%Y-%m-%d %H:%M")
+      "Fix Versions": ($issues.fields?.fixVersions.0?.name? | default "None")
+      "Affects Version": ($issues.fields?.versions.0?.name? | default "None")
+      "Components": ($issues.fields?.components?.0?.name? | default "None")
+      "Interface": ($issues.fields?.customfield_10204? | default "None")
+      "Status": $issues.fields?.status?.name?
+      "Product": ($issues.fields?.customfield_10600?.value? | default "None")
+      "Product Version": ($issues.fields?.customfield_10601? | default "None")
     }
   }
 }
@@ -76,7 +112,7 @@ def jira-request [
   let auth = (make-auth-header)
 
   # List of columns to drop from out table that JIRAs REST API returns
-  let excludes = [expand self]
+  let excludes = [self]
 
   if ($method == "GET") {
     http get --headers {
@@ -84,7 +120,7 @@ def jira-request [
       Accept: "application/json"
     } $url
   } else if ($method == "POST") {
-    let headers = { Authorization: $auth Accept: "application/json" "Content-Type": "application/json" }
+    let headers = {Authorization: $auth Accept: "application/json" "Content-Type": "application/json"}
     http post --headers $headers --content-type application/json $url $body
     | get issues
     | reject ...$excludes
@@ -99,23 +135,11 @@ def jira-request [
 #   jira get-issue ABC-123 --fields summary,status,assignee
 export def "jira get-issue" [
   key: string # Issue key (e.g., PROJECT-123)
-  --fields: string # Comma-separated list of fields to return (default: all)
-  --expand: string # Comma-separated list of parameters to expand (e.g., changelog, renderedFields)
-] {
+  --fields: string = $issue_fields # Comma-separated list of fields to return
+]: nothing -> record {
   mut endpoint = $"issue/($key)"
-  mut params = []
-
-  if ($fields != null) {
-    $params = ($params | append $"fields=($fields)")
-  }
-
-  if ($expand != null) {
-    $params = ($params | append $"expand=($expand)")
-  }
-
-  if (($params | length) > 0) {
-    $endpoint = $"($endpoint)?($params | str join '&')"
-  }
+  mut params = [] | append $"fields=($fields)"
+  $endpoint = $"($endpoint)?($params | str join '&')"
 
   jira-request $endpoint
 }
@@ -132,40 +156,81 @@ export def "jira get-issue" [
 # Output:
 #   table
 export def "jira search" [
-  jql: string              # JQL query string
-  --fields: string = "key" # Comma-separated list of fields to return (default: summary, status, assignee, created)
-  --max-results: int = 50  # Maximum number of results to return (default: 50)
+  jql: string # JQL query string
+  --fields (-f): string = $search_fields # Comma-separated list of fields to return (default: summary, status, assignee, created)
+  --max-results (-m): int = 50 # Maximum number of results to return. -1 for JIRA API limit (5000) (default: 50)
 ]: nothing -> table {
   mut query = $jql
 
+  mut total = match $max_results {
+    -1 => 5000
+    _ => $max_results
+  }
+
   mut body = {
     jql: $query
-    maxResults: $max_results
+    maxResults: $total
     fields: ($fields | split row ',')
     fieldsByKeys: true
-    expand: "name"
   }
 
   jira-request "search/jql" --method POST --body $body
 }
 
-# Get a simplified view of a JIRA issue
-#
-# Returns only key fields in a flat structure
-export def "jira get-issue-simple" [
-  key: string # Issue key (e.g., PROJECT-123)
-] {
-  let issue = (jira get-issue $key --fields "summary,status,assignee,reporter,priority,created,updated,description")
+# Take results from JQL query ->
+#   Build a table of all that are Done with affected version either blank or 2.0.25 with the fields of: Summary, Description, Component, Fix Version, Affected Version
 
-  {
-    key: $issue.key
-    summary: $issue.fields.summary
-    status: $issue.fields.status.name
-    assignee: ($issue.fields.assignee?.displayName? | default "Unassigned")
-    reporter: $issue.fields.reporter.displayName
-    priority: ($issue.fields.priority?.name? | default "None")
-    created: $issue.fields.created
-    updated: $issue.fields.updated
-    description: ($issue.fields.description? | default "")
+# Generates a changelog
+#
+# Examples:
+#   jira search 'project = ABC AND status = "In Progress"' | jira build changelog <product>
+#
+# Input:
+#   table
+# Output:
+#   table
+export def "jira changelog" [
+  product: string@products # Product for changelog i.e. CLIPS, State Interfaces, ConnectCIC
+]: nothing -> table {
+  # Using the product given, call jira search with a pre-defined JQL query only passsing the 'key' field
+  # so the results are not limited to only 100 items.
+  let jql = match ($product | str downcase) {
+    "state interfaces" => 'project = "State Interfaces" AND (status in (Done) AND created >= "2022-03-25") order by created ASC'
+    "clips" => 'project = CLIPS AND (status in (Done) AND created >= "2022-03-31") order by key asc'
+    "connectcic" => 'project = ConnectCIC AND (status in (Done) AND created >= "2022-03-25") order by key asc'
   }
+
+  #TODO: I want the columns to allow at least 25 characters of padding so product and created are not wrapped
+  let results = jira search $jql -f "key" -m -1 | match ($product | str downcase) {
+    "state interfaces" => {
+      # we use par-each so each loop is running in parallel instead of sequentially
+      # when tested with `each` it took an average of 22 seconds for 100 results
+      # when tested with `par-each` it took 1 second for 100 results
+      $in | par-each {|issue|
+        let details = jira get-issue $issue.Key
+        {
+          "Summary": ($details.fields.summary | default "None")
+          "Component": ($details.fields.components.0?.name? | "None")
+          "Fix Versions": ($details.fields.fixVersions.0?.name? | default "None")
+          "Affected Version": ($details.fields.versions.0?.name? | default "None")
+          "Created": ($details.fields.created | into datetime | format date "%Y-%m-%d %H:%M")
+        }
+      }
+    }
+    _ => {
+      $in | par-each {|issue|
+        let details = jira get-issue $issue.Key
+        {
+          "Summary": ($details.fields.summary | default "None")
+          "Components": ($details.fields.components.0?.name? | default "None")
+          "Interface": ($details.fields.customfield_10204 | "None")
+          "Fix Versions": ($details.fields.fixVersions.0?.name? | default "None")
+          "Affected Version": ($details.fields.versions.0?.name? | default "None")
+          "Created": ($details.fields.created | into datetime | format date "%Y-%m-%d %H:%M")
+        }
+      }
+    }
+  }
+
+  $results
 }

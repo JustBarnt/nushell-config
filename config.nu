@@ -43,7 +43,7 @@ $env.config.table = {
   mode: single #reinforced
   index_mode: auto
   show_empty: true
-  padding: {left: 1 right: 1}
+  padding: {left: 2 right: 2}
   trim: {
     methodology: wrapping
     wrapping_try_keep_words: true
@@ -51,6 +51,7 @@ $env.config.table = {
   }
   header_on_separator: false
   missing_value_symbol: "NULL"
+  batch_duration: 5sec
 }
 $env.config.error_style = "fancy"
 $env.config.rm.always_trash = true
@@ -119,7 +120,7 @@ $env.config.hooks = {
   env_change: {
     PWD: [{|before, after| null }] # run if the PWD environment is different since the last repl input
   }
-  display_output: "if (term size).columns >= 100 { table -e } else { table }" # run to display the output of a pipeline
+  display_output: "if (term size).columns >= 100 { table } else { table }" # run to display the output of a pipeline
   command_not_found: { null } # return an error message when a command is not found
 }
 
@@ -273,4 +274,14 @@ def "empty trash" [] {
     # run pwsh -c 'whoami /user' to find your SID and replace it there
     rm -rf C:\$Recycle.Bin\S-1-5-21-328912919-4025806940-3881157763-8676\
   }
+}
+
+def "str collapse" []: string -> string {
+  $in
+  | split chars
+  | enumerate
+  | group-by {|x| $x.index // 20}
+  | values
+  | each {|chunk| $chunk | get item | str join}
+  | str join "\n"
 }
