@@ -21,6 +21,7 @@ export def start [
   --branch (-b)
   --path (-p): string@branches
   --tools (-t)
+  --port (-P) = "8080"
 ] {
   mut CLIPS = 'D:\CommSys\CLIPS\'
 
@@ -31,7 +32,7 @@ export def start [
       }
       $CLIPS = ($CLIPS | path join $formtools)
       cd $CLIPS
-      php -S 127.0.0.1:8080 -t .
+      php -S $"127.0.0.1:($port)" -t .
       return;
   }
 
