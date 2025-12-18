@@ -3,15 +3,8 @@
 # Input:
 #   None
 export def "update" [] {
-  let $repo = get_repo_url
-  let $is_clips = is_clips_repo $repo
-
   try {
-    if $is_clips {
-      dbmanager export-content --database="Clips1"
-    } else {
-      dbmanager export-content
-    }
+    dbmanager export-content
 
     log "Export finished - Checking to for upstream changes..."
 
@@ -24,14 +17,7 @@ export def "update" [] {
     git pull --rebase --autostash origin dev
     log "Successfully updated from remote..."
 
-    if ($is_clips) {
-      dbmanager import-content --database="Clips1"
-      log "Syncing Changes between Clips 1 and Clips 2 database..."
-      cd ../database-2/
-      .\dbsync CLIPS1 CLIPS2 localhost
-    } else {
-      dbmanager import-content
-    }
+    dbmanager import-content
   } catch {|err|
     log "Something went wrong..."
     log "" -e $err
