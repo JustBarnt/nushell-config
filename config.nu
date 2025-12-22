@@ -124,6 +124,9 @@ $env.config.hooks = {
   command_not_found: { null } # return an error message when a command is not found
 }
 
+# Add zoxide completions if installed
+source .zoxide.nu
+
 # Custom Completion Sources
 source ./completions/dbmanager-completions.nu
 source ./completions/cargo-completions.nu
