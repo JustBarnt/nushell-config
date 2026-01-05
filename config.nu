@@ -150,13 +150,14 @@ use modules/expand
 use modules/windows
 use modules/jira *
 
-try {
-  mkdir ($nu.data-dir | path join "vendor/autoload")
-  starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu") 
-} catch {|err|
-  log "" -e $err
-}
+# try {
+#   mkdir ($nu.data-dir | path join "vendor/autoload")
+#   starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu") 
+# } catch {|err|
+#   log "" -e $err
+# }
 
+oh-my-posh init nu --config ~/.config/config.omp.json
 
 # Alias VIM
 alias core-vim = vim

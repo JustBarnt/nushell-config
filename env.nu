@@ -124,7 +124,3 @@ $env.NEOVIDE_CONFIG = "~/.config/neovide/neovide.toml"
 
 # To load from a custom file you can use:
 # source ()
-
-let starship_dir = "~/.local/share/starship"
-
-mkdir ~/.local/share/starship | starship init nu | save -f ~/.local/share/starship/init.nu
