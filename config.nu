@@ -27,7 +27,7 @@
 # directory is included:
 # const NU_LIB_DIRS = [
 #     ($nu.default-config-dir | path join 'scripts') # add <nushell-config-dir>/scripts
-#     ($nu.data-dir | path join 'completions') # default home for nushell completions
+($nu.data-dir | path join 'completions') # default home for nushell completions
 # ]
 # # You can replace (override) or append to this list by shadowing the constant
 # const NU_LIB_DIRS = $NU_LIB_DIRS ++ [($nu.default-config-dir | path join 'modules')]
@@ -124,17 +124,31 @@ $env.config.hooks = {
   command_not_found: { null } # return an error message when a command is not found
 }
 
+$env.config.menus ++= [{
+  name: completion_menu
+  only_buffer_difference: false
+  marker: "| "
+  type: {
+    layout: ide
+    columns: 1
+    col_width: 25
+    selection_rows: 20
+    description_rows: 20
+  }
+  style: {
+
+  }
+}]
+
 # Add zoxide completions if installed
 source .zoxide.nu
+source $"($nu.cache-dir)/carapace.nu"
 
 # Custom Completion Sources
 source ./completions/dbmanager-completions.nu
-source ./completions/cargo-completions.nu
 source ./completions/completions-jj.nu
 source ./completions/dotnet-completions.nu
 source ./completions/tree-sitter-completions.nu
-source ./completions/git-completions.nu
-source ./completions/rg-completions.nu
 source ./completions/scoop-completions.nu
 source ./completions/uv-completions.nu
 source ./completions/winget-completions.nu

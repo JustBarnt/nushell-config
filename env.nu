@@ -122,5 +122,9 @@ $env._ZO_RESOLVE_SYMLINKS = 1
 
 $env.NEOVIDE_CONFIG = "~/.config/neovide/neovide.toml"
 
+$env.CARAPACE_BRIDGES = 'zsh,fish,bash,inshellisense'
+mkdir $"($nu.cache-dir)"
+carapace _carapace nushell | save --force $"($nu.cache-dir)/carapace.nu"
+
 # To load from a custom file you can use:
 # source ()
