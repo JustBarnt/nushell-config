@@ -94,7 +94,9 @@ if (sys host | get hostname | $in == "commsys-PC58") {
 if (sys host | $in.name == "Windows") {
   $env.HOME = ([$env.HOMEDRIVE $env.HOMEPATH]) | path join
   path add ($env.PATH | path join $'($env."ProgramFiles(x86)")\Microsoft Visual Studio\Installer\')
+  path add ($env.PATH | path join 'D:/WinGet/uv')
 }
+
 
 # TODO: All of these if I am on windows need to get added via dos command to my path instead of being set on if I am in terminal
 $env.BAT_CONFIG_PATH = '~/.config/bat/'
