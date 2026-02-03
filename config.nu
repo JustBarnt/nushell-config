@@ -124,22 +124,6 @@ $env.config.hooks = {
   command_not_found: { null } # return an error message when a command is not found
 }
 
-$env.config.menus ++= [{
-  name: completion_menu
-  only_buffer_difference: false
-  marker: "| "
-  type: {
-    layout: ide
-    columns: 1
-    col_width: 25
-    selection_rows: 20
-    description_rows: 20
-  }
-  style: {
-
-  }
-}]
-
 # Add zoxide completions if installed
 source .zoxide.nu
 source $"($nu.cache-dir)/carapace.nu"
