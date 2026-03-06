@@ -85,7 +85,7 @@ export def main [] {
 
         foreground: '#DCD7BA'
         background: '#1F1F28'
-        cursor: '#DCD7BA'
+        cursor: '#C8C093'
 
         empty: '#7E9CD8'
         header: { fg: '#98BB6C' attr: 'b' }
