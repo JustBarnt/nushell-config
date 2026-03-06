@@ -35,8 +35,8 @@
 # # An environment variable version of this also exists. It is searched after the constant.
 # $env.NU_LIB_DIRS ++= [ ($nu.data-dir | path join "nu_scripts") ]
 
-use themes/onedark.nu
-$env.config.color_config = (onedark)
+use themes/kanagawa.nu
+$env.config.color_config = (kanagawa)
 $env.config.show_banner = false
 $env.config.filesize.unit = "binary"
 $env.config.table = {
@@ -129,7 +129,7 @@ source .zoxide.nu
 source $"($nu.cache-dir)/carapace.nu"
 
 # Custom Completion Sources
-source ./completions/dbmanager-completions.nu
+# source ./completions/dbmanager-completions.nu
 source ./completions/completions-jj.nu
 source ./completions/dotnet-completions.nu
 source ./completions/tree-sitter-completions.nu
