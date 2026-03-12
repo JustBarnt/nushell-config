@@ -86,7 +86,8 @@ use std "path add"
 path add ($env.PATH | path join '~/.local/bin')
 
 if (sys host | get hostname | $in == "commsys-PC58") {
-  path add ($env.PATH | path join 'D:\CommSys\Tools\DbManager\.bin')
+  # path add ($env.PATH | path join 'D:\CommSys\Tools\DbManager\.bin')
+  path add ($env.PATH | path join 'C:\Utilities\DbManager\1.10.0\')
   path add ($env.PATH | path join 'C:\Utilities\SysinternalsSuite\')
   path add ($env.PATH | path join 'C:\Utilities\StrawberryPerl\perl\bin')
 }

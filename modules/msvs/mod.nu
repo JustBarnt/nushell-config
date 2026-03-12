@@ -7,7 +7,7 @@ def --env find_msvs [] {
     let vswhere_cmd = ($'($env."ProgramFiles(x86)")\Microsoft Visual Studio\Installer\vswhere.exe')
     let info = (
       if ($vswhere_cmd | path exists) {
-        (^$vswhere_cmd -prerelease -products '*' -format json -nocolor -utf8 -sort | from json)
+        (^$vswhere_cmd -prerelease -products '*' -format json -nocolor -utf8 | from json)
       } else {
         # this should really error out here
         ('[{"installationPath": ""}]' | from json)
