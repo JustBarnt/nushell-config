@@ -126,7 +126,6 @@ $env.config.hooks = {
 
 # Add zoxide completions if installed
 source .zoxide.nu
-source $"($nu.cache-dir)/carapace.nu"
 
 # Custom Completion Sources
 # source ./completions/dbmanager-completions.nu
@@ -135,7 +134,6 @@ source ./completions/dotnet-completions.nu
 source ./completions/tree-sitter-completions.nu
 source ./completions/scoop-completions.nu
 source ./completions/uv-completions.nu
-source ./completions/winget-completions.nu
 
 # Custom Modules
 use modules/log
