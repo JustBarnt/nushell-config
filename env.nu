@@ -91,6 +91,7 @@ if (sys host | get hostname | $in == "commsys-PC58") {
   path add ($env.PATH | path join 'C:\Utilities\SysinternalsSuite\')
   path add ($env.PATH | path join 'C:\Utilities\StrawberryPerl\perl\bin')
   path add ($env.PATH | path join 'C:\Program Files (x86)\Caphyon\Advanced Installer 23.5.1\bin\x86')
+  path add ($env.PATH | path join 'C:/Program Files/Microsoft Visual Studio/2022/Professional/VC/Tools/Llvm/bin')
 }
 
 if (sys host | $in.name == "Windows") {
