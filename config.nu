@@ -134,6 +134,7 @@ source ./completions/dotnet-completions.nu
 source ./completions/tree-sitter-completions.nu
 source ./completions/scoop-completions.nu
 source ./completions/uv-completions.nu
+source ./completions/winget-completions.nu
 
 # Custom Modules
 use modules/log
