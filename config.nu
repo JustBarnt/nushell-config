@@ -35,8 +35,9 @@
 # # An environment variable version of this also exists. It is searched after the constant.
 # $env.NU_LIB_DIRS ++= [ ($nu.data-dir | path join "nu_scripts") ]
 
-use themes/kanagawa.nu
-$env.config.color_config = (kanagawa)
+use themes/everforest.nu
+$env.config.auto_cd_implicit = true
+$env.config.color_config = (everforest)
 $env.config.show_banner = false
 $env.config.filesize.unit = "binary"
 $env.config.table = {
