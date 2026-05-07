@@ -7,7 +7,7 @@ def --env find_msvs [] {
     let vswhere_cmd = ($'($env."ProgramFiles(x86)")\Microsoft Visual Studio\Installer\vswhere.exe')
     let info = (
       if ($vswhere_cmd | path exists) {
-        (^$vswhere_cmd -prerelease -products '*' -format json -nocolor -utf8 | from json)
+        (^$vswhere_cmd -format json -nocolor -utf8 | from json)
       } else {
         # this should really error out here
         ('[{"installationPath": ""}]' | from json)
@@ -34,6 +34,7 @@ def --env find_msvs [] {
       [
         $'($env.MSVS_ROOT)\Include\($env.MSVS_MSDK_VER)\cppwinrt\winrt'
         $'($env.MSVS_MSVC_ROOT)\Include'
+        $'($env.MSVS_MSVC_ROOT)\atlmfc\include'
         $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\cppwinrt\winrt'
         $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\shared'
         $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\ucrt'
@@ -82,7 +83,7 @@ export def --env activate [
   find_msvs
 
   if (($env.MSVS_ROOT | is-empty) or ($env.MSVS_MSVC_ROOT | is-empty)) {
-    print "Either Microsoft Visual Studio or MSVC is valid."
+    print "Either Microsoft Visual Studio or MSVC is invalid."
     return
   }
 
