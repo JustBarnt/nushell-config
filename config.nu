@@ -119,7 +119,7 @@ $env.config.hooks = {
   # pre_prompt: [{ null }] # run before the prompt is shown
   pre_execution: [{ null }] # run before the repl input is run
   env_change: {
-    PWD: [{|before, after| null }] # run if the PWD environment is different since the last repl input
+    PWD: [{|before after| null }] # run if the PWD environment is different since the last repl input
   }
   display_output: "if (term size).columns >= 100 { table } else { table }" # run to display the output of a pipeline
   command_not_found: { null } # return an error message when a command is not found
@@ -139,7 +139,7 @@ source ./completions/winget-completions.nu
 
 # Custom Modules
 use modules/log
-use modules/utils [from-rgb to-rgb]
+use modules/utils [ from-rgb to-rgb ]
 use modules/clips
 use modules/db
 use modules/docs
@@ -150,7 +150,7 @@ use modules/jira *
 
 try {
   mkdir ($nu.data-dir | path join "vendor/autoload")
-  starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu") 
+  starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
 } catch {|err|
   log "" -e $err
 }
@@ -170,7 +170,7 @@ def --env y [...args] {
   rm -fp $tmp
 }
 
-def usevim [name: string, args] {
+def usevim [name: string args] {
   $env.NVIM_APPNAME = $name
   nvim $args
 }
@@ -203,13 +203,15 @@ def "logs copy" [path: string] {
       let copy_from = $JIRA_ATTACHMENTS_DIR | path join $case_dir
 
       try {
-        let item = (ls -m $copy_from | reduce {|item, acc|
-          if ($item.modified) > ($acc.modified) {
-            $item
-          } else {
-            $acc
+        let item = (
+          ls -m $copy_from | reduce {|item acc|
+            if ($item.modified) > ($acc.modified) {
+              $item
+            } else {
+              $acc
+            }
           }
-        })
+        )
 
         match $item.type {
           "application/zip" => {
@@ -235,11 +237,11 @@ def glog [count: int] {
   git log --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD -n $count | lines | split column "»¦«" commit subject name email date
 }
 
-def "ternary closure" [condition: closure, first: any, second: any]: any -> any {
+def "ternary closure" [condition: closure first: any second: any]: any -> any {
   if (do $condition) { $first } else { $second }
 }
 
-def "ternary boolean" [condition: bool, first: any, second: any]: any -> any {
+def "ternary boolean" [condition: bool first: any second: any]: any -> any {
   if $condition { $first } else { $second }
 }
 
@@ -257,6 +259,25 @@ def "count tags" [patterns: list<string>] {
     let count = rg -o $pat | wc -l
 
     return {pattern: $pat found: $count}
+  }
+}
+
+def svn-stat [file?: path] {
+  let diff_input = if $file != null {
+    svn diff $file | lines
+  } else {
+    svn diff | lines
+  }
+
+  $diff_input | reduce -f {adds: 0 dels: 0 files: []} {|line acc|
+    if ($line | str starts-with '--- ') {
+      let file = ($line | str replace '--- ' '' | split row $'\t' | first)
+      {adds: $acc.adds dels: $acc.dels files: ($acc.files | append $file)}
+    } else if ($line | str starts-with '+') and not ($line | str starts-with '+++') {
+      {adds: ($acc.adds + 1) dels: $acc.dels files: $acc.files}
+    } else if ($line | str starts-with '-') and not ($line | str starts-with '---') {
+      {adds: $acc.adds dels: ($acc.dels + 1) files: $acc.files}
+    } else { $acc }
   }
 }
 
