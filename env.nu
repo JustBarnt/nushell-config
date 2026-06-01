@@ -105,7 +105,6 @@ if (sys host | $in.name == "Windows") {
 $env.BAT_CONFIG_PATH = '~/.config/bat/'
 $env.YAZI_CONFIG_HOME = '~/.config/yazi/'
 $env.TELEVISION_CONFIG = 'C:\Users\bwilliams\.config\television\'
-$env.OPENSSL_DIR = 'C:\Users\bwilliams\scoop\apps\openssl\current\bin\'
 
 $env.GOPATH = 'C:\Users\bwilliams\go\'
 $env.PNPM_HOME = 'C:\Users\bwilliams\AppData\Local\pnpm\'
