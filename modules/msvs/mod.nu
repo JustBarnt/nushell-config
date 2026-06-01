@@ -32,13 +32,14 @@ def --env find_msvs [] {
 
     $env.MSVS_INCLUDE_PATH = (
       [
-        $'($env.MSVS_ROOT)\Include\($env.MSVS_MSDK_VER)\cppwinrt\winrt'
+        $'($env.MSVS_ROOT)\Include\($env.MSVS_MSDK_VER)\cppwinrt'
         $'($env.MSVS_MSVC_ROOT)\Include'
         $'($env.MSVS_MSVC_ROOT)\atlmfc\include'
-        $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\cppwinrt\winrt'
+        $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\cppwinrt'
         $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\shared'
         $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\ucrt'
         $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\um'
+        $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\winrt'
       ] | str join (char esep)
     )
 
