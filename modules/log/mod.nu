@@ -30,7 +30,7 @@ export def main [
     return
   }
 
-  let $diag = ($prefix | str upcase)
+  let $diag = ($prefix | str uppercase)
   match $diag {
     "ERROR" => (print $"(ansi rb)[ERROR] ($message)(ansi reset)"),
     "WARN"  => (print $"(ansi yb)[ WARN] ($message)(ansi reset)"),

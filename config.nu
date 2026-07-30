@@ -131,7 +131,7 @@ source .zoxide.nu
 # Custom Completion Sources
 # source ./completions/dbmanager-completions.nu
 source ./completions/completions-jj.nu
-# source ./completions/dotnet-completions.nu
+source ./completions/dotnet-completions.nu
 source ./completions/tree-sitter-completions.nu
 source ./completions/scoop-completions.nu
 source ./completions/uv-completions.nu
@@ -199,7 +199,7 @@ def "logs copy" [path: string] {
         mkdir $env.JIRA_CASE_DIR
       }
 
-      let case_dir = $path | str upcase
+      let case_dir = $path | str uppercase
       let copy_from = $JIRA_ATTACHMENTS_DIR | path join $case_dir
 
       try {

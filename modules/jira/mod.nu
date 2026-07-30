@@ -194,14 +194,14 @@ export def "jira changelog" [
 ]: nothing -> table {
   # Using the product given, call jira search with a pre-defined JQL query only passsing the 'key' field
   # so the results are not limited to only 100 items.
-  let jql = match ($product | str downcase) {
+  let jql = match ($product | str lowercase) {
     "state interfaces" => 'project = "State Interfaces" AND (status in (Done) AND created >= "2022-03-25") order by created ASC'
     "clips" => 'project = CLIPS AND (status in (Done) AND created >= "2022-03-31") order by key asc'
     "connectcic" => 'project = ConnectCIC AND (status in (Done) AND created >= "2022-03-25") order by key asc'
   }
 
   #TODO: I want the columns to allow at least 25 characters of padding so product and created are not wrapped
-  let results = jira search $jql -f "key" -m -1 | match ($product | str downcase) {
+  let results = jira search $jql -f "key" -m -1 | match ($product | str lowercase) {
     "state interfaces" => {
       # we use par-each so each loop is running in parallel instead of sequentially
       # when tested with `each` it took an average of 22 seconds for 100 results
