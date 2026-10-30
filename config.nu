@@ -146,6 +146,7 @@ use modules/docs
 use modules/msvs
 use modules/expand
 use modules/windows
+use modules/phpv
 use modules/jira *
 
 try {

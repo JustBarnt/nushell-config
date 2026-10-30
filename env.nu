@@ -124,8 +124,6 @@ $env.JAVA_HOME = "C:/Program Files/Java/jdk-24"
 
 $env._ZO_RESOLVE_SYMLINKS = 1
 
-$env.NEOVIDE_CONFIG = "~/.config/neovide/neovide.toml"
-
 mkdir $"($nu.cache-dir)"
 
 # To load from a custom file you can use:
