@@ -34,7 +34,7 @@ export def init [
   let res = try-open-cfg
 
   try {
-    let out = $res.data | upsert $.Root $root
+    let out = $res.data | upsert $.Root ($root | path split | path join)
     $out | to nuon --indent 2 | save -f $'(cfg-path)\phpmanager.nuon'
   } catch {|err|
     log -e $err ""
@@ -56,7 +56,7 @@ export def add [
   }
 
   try {
-    let out = $res.data | upsert $cell_path $path
+    let out = $res.data | upsert $cell_path ($path | path split | path join)
     $out | to nuon --indent 2 | save -f $'(cfg-path)\phpmanager.nuon'
   } catch {|err|
     log -e $err ""
