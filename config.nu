@@ -1,3 +1,8 @@
+if $env.TERM == "xterm-ghostty" {
+  source ./ghostty.nu
+  use ghostty *
+}
+
 # config.nu
 #
 # Installed by:

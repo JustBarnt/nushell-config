@@ -104,7 +104,8 @@ if (sys host | $in.name == "Windows") {
 # TODO: All of these if I am on windows need to get added via dos command to my path instead of being set on if I am in terminal
 $env.BAT_CONFIG_PATH = '~/.config/bat/'
 $env.YAZI_CONFIG_HOME = '~/.config/yazi/'
-$env.TELEVISION_CONFIG = 'C:\Users\bwilliams\.config\television\'
+$env.TELEVISION_CONFIG =  $"($env.USERPROFILE)\\.config\\television\\" 
+$env.KOMOREBI_CONFIG_HOME = $"($env.USERPROFILE)\\.config\\komorebi\\"
 
 $env.GOPATH = 'C:\Users\bwilliams\go\'
 $env.PNPM_HOME = 'C:\Users\bwilliams\AppData\Local\pnpm\'
