@@ -145,8 +145,6 @@ use modules/windows
 use modules/phpv
 use modules/jira *
 
-oh-my-posh init nu --config ../oh-my-posh.toml
-
 # try {
 #   mkdir ($nu.data-dir | path join "vendor/autoload")
 #   starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
@@ -298,3 +296,6 @@ def "empty trash" [] {
     rm -rf C:\$Recycle.Bin\S-1-5-21-328912919-4025806940-3881157763-8676\
   }
 }
+
+
+oh-my-posh init nu --strict --config $'($env.USERPROFILE)\.config\oh-my-posh.toml'
