@@ -1,4 +1,6 @@
-def --env find_msvs [] {
+def --env find_msvs [
+  --index (-i): number = 0
+] {
   export-env {
     $env.MSVS_BASE_PATH = $env.Path
     $env.PATH_VAR = (if "Path" in $env { "Path" } else { "PATH" })
@@ -14,7 +16,7 @@ def --env find_msvs [] {
       }
     )
 
-    $env.MSVS_ROOT = $info.0.installationPath
+    $env.MSVS_ROOT =  $info | get 1 | $in.installationPath
 
     $env.MSVS_MSVC_ROOT = (
       if not ($'($env.MSVS_ROOT)\VC\Tools\MSVC\' | path exists) {
@@ -70,7 +72,8 @@ def --env find_msvs [] {
 }
 
 export def --env activate [
-  --host (-h): string = x64 # Host architecture, must be x64 or x86 (case insensitive)
+  --index (-i): int = 0       # Which VS installation to use if you have more than, defaults to 0
+  --host (-h): string = x64   # Host architecture, must be x64 or x86 (case insensitive)
   --target (-t): string = x64 # Target architecture, must be x64 or x86 (case insensitive)
   --sdk (-s): string = latest # Version of Windows SDK, must be "latest" or a valid version string
   --silent
@@ -80,7 +83,7 @@ export def --env activate [
   # 1. I couldn't use activate because it depends on env vars being set that were hidden with deactivate
   # 2. It seems that export-env executed at `use`, leaves `$env.FILE_PWD` available in the environment
   #    which I think may be a bug. So, putting it in a custom command avoids that.
-  find_msvs
+  find_msvs --index $index
 
   if (($env.MSVS_ROOT | is-empty) or ($env.MSVS_MSVC_ROOT | is-empty)) {
     print "Either Microsoft Visual Studio or MSVC is invalid."
