@@ -1,5 +1,5 @@
 def --env find_msvs [
-  --index (-i): number = 0
+  --index (-i): int = 0
 ] {
   export-env {
     $env.MSVS_BASE_PATH = $env.Path
@@ -16,7 +16,7 @@ def --env find_msvs [
       }
     )
 
-    $env.MSVS_ROOT =  $info | get 1 | $in.installationPath
+    $env.MSVS_ROOT =  $info | get $index | $in.installationPath
 
     $env.MSVS_MSVC_ROOT = (
       if not ($'($env.MSVS_ROOT)\VC\Tools\MSVC\' | path exists) {
@@ -40,7 +40,7 @@ def --env find_msvs [
         $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\cppwinrt'
         $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\shared'
         $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\ucrt'
-        $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\um'
+        $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)um'
         $'($env.MSVS_MSDK_ROOT)Include\($env.MSVS_MSDK_VER)\winrt'
       ] | str join (char esep)
     )
