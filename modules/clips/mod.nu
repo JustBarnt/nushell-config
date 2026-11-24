@@ -1,56 +1,52 @@
 export def main [] { }
 
-const CLIPS = 'D:\CommSys\CLIPS\'
+const CLIPS = 'D:\commsys\clips\'
 
 def branches [] {
-    let branches = []
-    let $clips_branches = ls D:\CommSys\CLIPS\CLIPS\Branches
-    | where type == dir
-    | get name
-    | path parse
-    | get stem
+  let branches = []
+  let $clips_branches = ls D:\commsys\clips\clips\branches
+  | where type == dir
+  | get name
+  | path parse
+  | get stem
 
-    let $tool_branches = ls D:\CommSys\CLIPS\FormTools\Branches
-    | where type == dir
-    | get name
-    | path parse
-    | get stem
+  let $tool_branches = ls D:\commsys\clips\formtools\branches
+  | where type == dir
+  | get name
+  | path parse
+  | get stem
 
-    let $tag_branches = ls D:\CommSys\CLIPS\CLIPS\Tags
-    | where type == dir
-    | get name
-    | path parse -e ''
-    | get stem
-    
-   $clips_branches | append $tool_branches | append $tag_branches
+  let $tag_branches = ls D:\commsys\clips\clips\tags
+  | where type == dir
+  | get name
+  | path parse -e ''
+  | get stem
+
+  $clips_branches | append $tool_branches | append $tag_branches
 }
 
 export def start [
-  --branch (-b)
   --path (-p): string@branches
+  --port (-P): int
+  --branch (-b)
   --tools (-t)
   --tag (-T)
-  --port (-P) = "8080"
 ] {
-  match $tools {
-    true => {
-      mut $formtools = 'FormTools\Trunk\ClipsWebTools'
-      if $branch {
-        $formtools = $'FormTools\Branches\($path)\ClipsWebTools'
-      }
-      cd ($CLIPS | path join $formtools)
-      php -S $"127.0.0.1:($port)" -t .
+  if $tools {
+    mut $port = $port | default 8080
+    mut $formtools = 'formtools\trunk\clipswebtools'
+    cd ($CLIPS | path join $formtools)
+    php -S $"127.0.0.1:($port)" -t .
+  } else {
+    mut $port = $port | default 80
+    if $branch {
+      cd ($CLIPS | path join $'clips\branches\($path)\application')
+    } else if $tag {
+      cd ($CLIPS | path join $'clips\tags\($path)\application')
+    } else {
+      cd ($CLIPS | path join $'clips\trunk\application')
     }
-    false => {
-      if $branch {
-        cd ($CLIPS | path join $'CLIPS\Branches\($path)\Application')
-      } else if $tag {
-        cd ($CLIPS | path join $'CLIPS\Tags\($path)\Application')
-      } else {
-        cd ($CLIPS | path join $'CLIPS\Trunk\Application')
-      }
 
-      ./console/cake.bat server -H 127.0.0.1 -p 80
-    }
+    ./console/cake.bat server -H 127.0.0.1 -p $port
   }
 }
